@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://qr.blzr.sbs/sitemap.xml
