@@ -40,7 +40,7 @@ Supported QR types:
 Implementation details:
 
 - The QR type dropdown controls the dynamic form rendered inside the generator panel.
-- Each QR type has its own field template in `assets/app.js`.
+- Each QR type has its own field template in `index.js`.
 - The selected form values are converted into a QR payload by `buildQRData()`.
 - The QR preview updates live whenever the user changes content, colors, QR size, logo, or error correction level.
 - QR rendering is handled by `QRCodeStyling`.
@@ -475,8 +475,8 @@ Cached resources include:
 ./manifest.webmanifest
 ./robots.txt
 ./sitemap.xml
-./assets/styles.css
-./assets/app.js
+./index.css
+./index.js
 ./assets/icon.svg
 ./assets/icon-192.png
 ./assets/og-image.png

@@ -1,8 +1,8 @@
-const CACHE_VERSION = "2026-05-28-v2";
+const CACHE_VERSION = "2026-06-03";
 const CACHE_NAME = `qr-studio-${CACHE_VERSION}`;
 const APP_SHELL = [
   "./", "./index.html", "./about.html", "./404.html",
-  "./manifest.webmanifest", "./assets/styles.css", "./assets/app.js",
+  "./manifest.webmanifest", "./index.css", "./index.js",
   "./assets/icon.svg", "./assets/icon-192.png",
   "./assets/vendor/qr-code-styling.min.js", "./assets/vendor/html5-qrcode.min.js"
 ];
