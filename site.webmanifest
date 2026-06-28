@@ -1,0 +1,92 @@
+{
+  "name": "QR Studio",
+  "short_name": "QR Studio",
+  "start_url": "./index.html",
+  "display_override": ["fullscreen", "minimal-ui"],
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#6750A4",
+  "icons": [
+    {
+      "src": "assets/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icon-monochrome.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshot-mobile.png",
+      "sizes": "518x1120",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "assets/screenshot-desktop.png",
+      "sizes": "2237x1275",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create QR",
+      "url": "./index.html?action=create",
+      "icons": [
+        {
+          "src": "assets/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Scan QR",
+      "url": "./index.html?action=scan",
+      "icons": [
+        {
+          "src": "assets/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./index.html?action=shared-scan",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "qr_image",
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/*"
+          ]
+        }
+      ]
+    }
+  }
+}

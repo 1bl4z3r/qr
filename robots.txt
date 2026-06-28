@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Exclude caching artifacts if you host on certain CDNs, but generally safe to allow all for static PWAs.
+Disallow: /*.json$
+Allow: /site.webmanifest
+
 Sitemap: https://qr.blzr.sbs/sitemap.xml

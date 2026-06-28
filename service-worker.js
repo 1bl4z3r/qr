@@ -1,105 +1,51 @@
-const CACHE_VERSION = "2026-06-03";
-const CACHE_NAME = `qr-studio-${CACHE_VERSION}`;
-const APP_SHELL = [
-  "./", 
-  "./index.html", 
-  "./about.html", 
-  "./404.html",
-  "./manifest.webmanifest", 
-  "./assets/styles.css", 
-  "./assets/app.js",
-  "./assets/icon.svg", 
-  "./assets/icon-192.png", 
-  "./assets/vendor/qr-code-styling.min.js", 
-  "./assets/vendor/html5-qrcode.min.js"
+const CACHE_NAME = 'qr-studio-2.0';
+const SHARED_IMAGE_CACHE = 'qr-shared-image-cache';
+const ASSETS_TO_CACHE = [
+  './', 
+  './index.html', 
+  './style.css', 
+  './app.js', 
+  './site.webmanifest',
+  'https://unpkg.com/html5-qrcode',
+  'https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js',
+  'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap',
+  'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0'
 ];
 
-self.addEventListener("install", e => {
+self.addEventListener('install', (event) => {
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(c => c.addAll(APP_SHELL))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)));
 });
 
-self.addEventListener("activate", e => {
-  e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.map(k => k === CACHE_NAME ? Promise.resolve() : caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
 });
 
-self.addEventListener('fetch', event => {
-  // 1. Intercept Share Target Image Uploads
-  if (event.request.method === 'POST' && event.request.url.includes('?action=shared-image')) {
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // INTERCEPT: Web Share Target POST Request
+  if (event.request.method === 'POST' && url.searchParams.get('action') === 'shared-scan') {
     event.respondWith((async () => {
-      const formData = await event.request.formData();
-      const file = formData.get('image');
-      
-      // Store the image temporarily in a specific cache so app.js can pick it up
-      const cache = await caches.open('shared-image-cache');
-      await cache.put(new Request('/shared-image-temp'), new Response(file));
-      
-      // Redirect to the scanner section natively
-      return Response.redirect('/?action=scan&shared=true', 303);
+      try {
+        const formData = await event.request.formData();
+        const file = formData.get('qr_image');
+        
+        // Save the file to a temporary cache so the frontend can retrieve it
+        const cache = await caches.open(SHARED_IMAGE_CACHE);
+        await cache.put(new Request('/shared-image-temp'), new Response(file));
+        
+        // Redirect to the app as a standard GET request to prevent static server crashes
+        return Response.redirect('/index.html?action=scan&shared_file=true', 303);
+      } catch (err) {
+        return Response.redirect('/index.html?action=scan&error=share_failed', 303);
+      }
     })());
-    return;
+    return; // Exit fetch handler for this request
   }
 
-  if (event.request.method !== 'GET') return;
-
-  // 2. Stale-While-Revalidate with Strict Offline Fallback
-  event.respondWith((async () => {
-    try {
-      // Check cache first. ignoreSearch ensures that URL parameters 
-      // (like /?action=create) don't cause cache misses.
-      const cachedResponse = await caches.match(event.request, { ignoreSearch: true });
-      
-      if (cachedResponse) {
-        // Check if file is older than 1 week
-        const dateHeader = cachedResponse.headers.get('date');
-        let isStale = true;
-        if (dateHeader) {
-          const age = Date.now() - new Date(dateHeader).getTime();
-          const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
-          if (age < ONE_WEEK) isStale = false;
-        }
-        
-        // Trigger background network revalidation if stale
-        if (isStale) {
-          event.waitUntil(
-            fetch(event.request).then(networkResponse => {
-              if (networkResponse && networkResponse.ok) {
-                caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse.clone()));
-              }
-            }).catch(() => {
-              // Silently fail the background fetch if the user is offline
-              console.log('Background sync skipped: Device is offline.');
-            })
-          );
-        }
-        return cachedResponse;
-      }
-      
-      // If not in cache, fetch from network
-      const networkResponse = await fetch(event.request);
-      if (networkResponse && networkResponse.ok) {
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(event.request, networkResponse.clone());
-      }
-      return networkResponse;
-      
-    } catch (error) {
-      // 3. OFFLINE FALLBACK
-      // A TypeError is thrown when the network fails completely (device offline)
-      if (event.request.mode === 'navigate') {
-        const cache = await caches.open(CACHE_NAME);
-        // Serve the cached index page for any failed page navigations
-        return cache.match('./index.html');
-      }
-      
-      // Re-throw the error for non-navigation requests so the browser handles them
-      throw error;
-    }
-  })());
+  // Standard Offline Caching (GET Requests)
+  event.respondWith(
+    caches.match(event.request).then((response) => response || fetch(event.request))
+  );
 });

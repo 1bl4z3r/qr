@@ -1,163 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <script>(()=>{try{const e=localStorage.getItem("theme"),t=matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.dataset.theme=e||(t?"dark":"light")}catch(e){matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches&&(document.documentElement.dataset.theme="dark")}})();</script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#6d5dfc">
-  <meta name="color-scheme" content="light dark">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="QR Studio">
-  <meta name="description" content="Create QR codes including UPI payment QR codes, scan QR codes from camera, image upload, drag-drop, or clipboard paste. Responsive offline-capable PWA.">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="assets/icon-192.png">
-  <link rel="stylesheet" href="index.css">
-  <title>QR Studio - Free QR Code Generator, UPI QR Generator and Scanner</title>
-</head>
-<body>
-  <div id="preloader" class="preloader">
-    <div class="loader-card"><span class="spinner"></span><strong>Loading QR Studio...</strong></div>
-  </div>
-  <div class="bg-orb orb-one"></div><div class="bg-orb orb-two"></div>
-  
-  <header class="site-header glass shell">
-    <div class="hero-copy">
-      <div class="hero-title-row">
-        <h1>QR Studio</h1><span id="networkStatus" class="status-badge">Checking...</span>
-      </div>
-      <p class="eyebrow toolkit-label">Offline-capable QR toolkit</p>
-      <p class="subtitle">Create regular QR codes and UPI payment QR codes, then scan QR codes with camera, upload, drag-drop, or paste.</p>
-    </div>
-    <nav class="header-actions">
-      <a class="btn secondary" href="about.html">About</a>
-      <button id="installBtn" class="btn secondary hidden" type="button">Install</button>
-      <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme">☾</button>
-    </nav>
-  </header>
 
-  <main class="app-shell shell">
-    <section class="panel glass">
-      <div class="section-heading">
-        <div><p class="eyebrow">Generator</p><h2>Create QR code</h2></div>
-        <span class="pill">PNG / SVG</span>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>QR Studio | Offline QR Code Generator & Scanner</title>
+  <meta name="description"
+    content="A free, offline-capable Progressive Web App to create and scan QR codes securely on your device.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://qr.blzr.sbs/">
+  <meta property="og:title" content="QR Studio | Free Offline QR Generator & Scanner">
+  <meta property="og:description"
+    content="Create, customize, and scan QR codes securely on your device. 100% free, fully offline, and privacy-focused PWA.">
+  <meta property="og:image" content="https://qr.blzr.sbs/assets/og-image.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Preview of the QR Studio application interface">
+  <meta property="og:site_name" content="QR Studio">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://qr.blzr.sbs/">
+  <meta name="twitter:title" content="QR Studio | Offline QR Generator">
+  <meta name="twitter:description"
+    content="Create, customize, and scan QR codes securely on your device. 100% free and fully offline.">
+  <meta name="twitter:image" content="https://qr.blzr.sbs/assets/og-image.webp">
+  <meta name="twitter:image:alt" content="Preview of the QR Studio application interface">
+  <meta name="theme-color" content="#6750A4">
+  <link rel="icon" type="image/svg+xml" href="/assets/icon-monochrome.svg">
+
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+
+  <link rel="mask-icon" href="/assets/icon-monochrome.svg" color="#6750A4">
+
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+  <script>
+    const savedAppTheme = localStorage.getItem('qr_app_theme') || 'system';
+    if (savedAppTheme !== 'system') document.documentElement.setAttribute('data-theme', savedAppTheme);
+  </script>
+</head>
+
+<body>
+
+  <main id="app-content" aria-live="polite">
+    <section id="create-view" class="view active" aria-labelledby="create-heading">
+      <h1 id="create-heading">Create QR Code</h1>
+      <div class="m3-card">
+        <label class="field-label" for="qr-type">QR Content Type</label>
+        <select id="qr-type" class="m3-input" aria-label="Select the type of QR code to generate"></select>
+        <div id="dynamic-form-container" role="form"></div>
+        <button id="btn-generate" class="m3-button primary" style="width: 100%; margin-top: 12px;">Generate QR</button>
       </div>
-      <div class="bento-grid generator-grid">
-        <div class="bento-tile tile-type">
-          <label>QR type
-            <select id="qrType">
-              <option value="text">Plain text</option>
-              <option value="url" selected>URL</option>
-              <option value="upi">UPI payment</option>
-              <option value="wifi">Wi-Fi</option>
-              <option value="vcard">Contact card</option>
-              <option value="email">Email</option>
-              <option value="phone">Phone / SMS</option>
-              <option value="event">Event</option>
-            </select>
-          </label>
-        </div>
-        <div class="bento-tile tile-size">
-          <label>QR size
-            <input id="qrSize" type="range" min="180" max="420" value="280">
-            <span id="sizeValue" class="hint">280px</span>
-          </label>
-          <label>Error correction
-            <select id="errorCorrection">
-              <option value="L">L - Low 7%</option>
-              <option value="M">M - Medium 15%</option>
-              <option value="Q" selected>Q - Quartile 25%</option>
-              <option value="H">H - High 30%</option>
-            </select>
-          </label>
-        </div>
-        <div class="bento-tile tile-fields">
-          <div class="tile-title-row"><strong>Content</strong><span class="hint">Fill mandatory fields</span></div>
-          <div id="dynamicFields" class="dynamic-fields single"></div>
-        </div>
-        <div class="bento-tile tile-validation">
-          <div class="tile-title-row"><strong>Validation</strong><span id="validationBadge" class="pill muted">Checking</span></div>
-          <ul id="validationList" class="validation-list"><li>Enter QR content to begin.</li></ul>
-        </div>
-        <div class="bento-tile tile-colors">
-          <div class="tile-title-row"><strong>Colors</strong><span class="hint">High contrast works best</span></div>
-          <div class="color-pair">
-            <label>Foreground<input id="foregroundColor" type="color" value="#111827"></label>
-            <label>Background<input id="backgroundColor" type="color" value="#ffffff"></label>
-          </div>
-        </div>
-        <div class="bento-tile tile-logo">
-          <div class="tile-title-row"><strong>Logo</strong><button id="clearLogoBtn" class="text-btn" type="button">Remove</button></div>
-          <label class="file-drop compact" for="logoInput">
-            <input id="logoInput" type="file" accept="image/*">
-            <span>Add logo/image</span><small>PNG, JPG, SVG recommended</small>
-          </label>
-        </div>
-        <div class="bento-tile tile-preview">
-          <div class="tile-title-row"><strong>Preview</strong><span id="previewEcHint" class="hint">Error correction: Q</span></div>
-          <div class="qr-preview-wrap"><div id="qrPreview" class="qr-preview"></div></div>
-          <div class="actions-row stretch-actions">
-            <button id="downloadPngBtn" class="btn primary" type="button">Download PNG</button>
-            <button id="downloadSvgBtn" class="btn secondary" type="button">Download SVG</button>
-            <button id="shareQrBtn" class="btn secondary" type="button">Share QR</button>
-          </div>
+
+      <div id="qr-result-card" class="m3-card" style="display: none;" aria-live="assertive">
+        <button id="btn-clear-qr-result" class="icon-btn-close" aria-label="Clear Generated QR"><span
+            class="material-symbols-outlined">close</span></button>
+        <div id="qr-canvas-container" aria-label="Generated QR Code image"></div>
+        <div class="action-buttons" style="justify-content: center;">
+          <button id="btn-download" class="m3-button primary"><span class="material-symbols-outlined"
+              aria-hidden="true">download</span> Download</button>
+          <button id="btn-share-qr" class="m3-button secondary"><span class="material-symbols-outlined"
+              aria-hidden="true">share</span> Share</button>
         </div>
       </div>
     </section>
 
-    <section class="panel glass" id="scanner-section">
-      <div class="section-heading">
-        <div><p class="eyebrow">Scanner</p><h2>Scan QR code</h2></div>
-        <span id="permissionBadge" class="pill muted">Camera idle</span>
-      </div>
-      <div class="bento-grid scanner-grid">
-        <div class="bento-tile tile-camera-select">
-          <label>Camera
-            <select id="cameraSelect">
-              <option value="environment">Back camera preferred</option>
-              <option value="user">Front camera preferred</option>
-            </select>
-          </label>
-        </div>
-        <div class="bento-tile tile-camera-actions">
-          <strong>Camera Controls</strong>
-          <div class="actions-row stretch-actions">
-            <button id="startScanBtn" class="btn primary" type="button">Start</button>
-            <button id="stopScanBtn" class="btn secondary" type="button" disabled>Stop</button>
-          </div>
-        </div>
-        <div class="bento-tile tile-reader">
-          <div class="tile-title-row"><strong>Camera view</strong><span class="hint">Display QR in front of camera</span></div>
-          <div id="reader" class="reader"></div>
-          <p class="hint no-margin">Tip: paste a QR screenshot anywhere on this page to scan it.</p>
-        </div>
-        <div class="bento-tile tile-upload">
-          <div class="tile-title-row"><strong>Image scan</strong></div>
-          <label class="file-drop" for="imageScanInput" id="imageDropZone">
-            <input id="imageScanInput" type="file" accept="image/*">
-            <span>Upload or drop a QR image</span><small>You can also paste a copied QR screenshot</small>
-          </label>
-        </div>
-        <div class="bento-tile tile-result">
-          <div class="result-header"><strong>Decoded result</strong><span id="resultType" class="pill muted">Waiting</span></div>
-          <textarea id="scanResult" readonly placeholder="Scanned QR content will appear here..."></textarea>
-          <div class="actions-row stretch-actions">
-            <button id="openUrlBtn" class="btn secondary" type="button" disabled>Open</button>
-            <button id="copyResultBtn" class="btn primary" type="button" disabled>Copy</button>
-            <button id="shareResultBtn" class="btn secondary" type="button" disabled>Share</button>
-          </div>
+    <section id="scan-view" class="view" aria-labelledby="scan-heading">
+      <h1 id="scan-heading">Scan QR Code</h1>
+      <div class="m3-card">
+        <div id="reader" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000;"></div>
+        <div class="action-buttons">
+          <button id="btn-start-scan" class="m3-button primary"><span class="material-symbols-outlined"
+              aria-hidden="true">camera</span> Start Camera</button>
+          <button id="btn-stop-scan" class="m3-button" style="display:none;">Stop Camera</button>
+          <label for="qr-file-upload" class="m3-button secondary" style="margin:0;"><span
+              class="material-symbols-outlined" aria-hidden="true">image</span> Load Image</label>
+          <input type="file" id="qr-file-upload" accept="image/*" style="display: none;">
         </div>
       </div>
+
+      <div id="scan-result-card" class="m3-card" style="display: none;" aria-live="polite">
+        <button id="btn-clear-scan-result" class="icon-btn-close" aria-label="Clear Scanned Result"><span
+            class="material-symbols-outlined">close</span></button>
+        <h3>Decoded Result</h3>
+
+        <img id="scan-image-preview" src=""
+          style="display:none; width: 100px; height: 100px; object-fit: contain; border-radius: 8px; margin-bottom: 12px; background: #fff;"
+          alt="Uploaded QR Image">
+
+        <textarea id="scan-result-text" class="m3-input" rows="4" readonly></textarea>
+        <div class="action-buttons">
+          <button id="btn-copy-result" class="m3-button primary">Copy</button>
+          <button id="btn-share-result" class="m3-button secondary">Share Text</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings-view" class="view" aria-labelledby="settings-heading">
+      <h1 id="settings-heading">Settings & Customization</h1>
+
+      <div class="m3-card">
+        <h3>App Preferences</h3>
+        <div class="setting-row">
+          <label for="app-theme-selector">App Theme</label>
+          <select id="app-theme-selector" class="m3-input" style="width: auto; margin:0;">
+            <option value="system">System Default</option>
+            <option value="light">Light Mode</option>
+            <option value="dark">Dark Mode</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="m3-card">
+        <h3>QR Appearance (Auto-Saved)</h3>
+        <div class="setting-row">
+          <label for="color-fg">Foreground Color</label>
+          <input type="color" id="color-fg">
+        </div>
+        <div class="setting-row" style="margin-bottom: 0;">
+          <label for="color-bg">Background Color</label>
+          <input type="color" id="color-bg">
+        </div>
+
+        <div class="contrast-box">
+          <span id="contrast-text">Checking Contrast...</span>
+          <small id="contrast-subtext">Calculating ratio...</small>
+        </div>
+
+        <div class="setting-row">
+          <label for="error-correction">Error Correction</label>
+          <select id="error-correction" class="m3-input" style="width: auto; margin:0;">
+            <option value="L">Low (7%)</option>
+            <option value="M">Medium (15%)</option>
+            <option value="Q">Quartile (25%)</option>
+            <option value="H">High (30%)</option>
+          </select>
+        </div>
+
+        <hr aria-hidden="true">
+        <h3>Integrated Logo</h3>
+        <p style="font-size: 14px; margin-bottom: 12px; opacity: 0.8;">Upload a logo to embed in the center of your QR
+          codes.</p>
+        <input type="file" id="logo-input" class="m3-input" accept="image/png, image/jpeg">
+
+        <div id="logo-preview-container" class="m3-card"
+          style="display: none; padding: 8px; margin-top: 8px; align-items: center; width: max-content;">
+          <button id="btn-clear-logo" class="icon-btn-close" style="top: -10px; right: -10px;"
+            aria-label="Remove uploaded logo"><span class="material-symbols-outlined">close</span></button>
+          <img id="logo-preview" src="" alt="Uploaded Logo Preview"
+            style="width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: #fff;">
+        </div>
+      </div>
+
+      <div class="m3-card">
+        <h3>About & FAQ</h3>
+        <p style="font-size: 14px; margin-bottom: 16px; line-height: 1.5; opacity: 0.9;"><strong>QR Studio -
+            v2.0</strong><br>A privacy-focused, offline-capable Progressive Web App for creating and scanning QR codes
+          securely on your device.</p>
+
+        <h4>Frequently Asked Questions</h4>
+
+        <details class="faq-item">
+          <summary>Is this app truly offline?</summary>
+          <p>Yes! Once loaded for the first time, your browser caches the app using a Service Worker. After that, you
+            don't need an internet connection to generate or scan QR codes.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>What happens to the data?</summary>
+          <p>Nothing leaves your device. Since this is a static site, all QR code generation and scanning happen
+            entirely locally within your browser. We do not collect, store, or transmit any usage data, analytics, or
+            personal information.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>What additional 3rd party libraries are being used?</summary>
+          <p>This app relies on two excellent open-source libraries: <strong>html5-qrcode</strong> for scanning QR codes
+            via your camera or images, and <strong>qr-code-styling</strong> for generating and customizing the QR codes.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary>How can I install on my phone?</summary>
+          <p>On Android (Chrome), tap the browser's three-dot menu and select "Install App" or "Add to Home Screen". On
+            iOS (Safari), tap the Share icon and select "Add to Home Screen". This lets you use it in full-screen mode
+            like a native app.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>What is this PWA?</summary>
+          <p>PWA stands for Progressive Web App. It is a modern web technology that allows a website to function exactly
+            like a native mobile or desktop app, offering features like offline capabilities, home screen installation,
+            and seamless performance.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>What is Error Correction?</summary>
+          <p>Error correction allows a QR code to be partially obscured, damaged, or covered (like adding a center logo)
+            while still remaining scannable. Higher error correction levels (like 'High') make the QR code pattern
+            denser but much more resilient to damage.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Why is the contrast ratio important?</summary>
+          <p>If the background and foreground colors are too similar (e.g., light gray on white), older smartphone
+            cameras will fail to read the QR code. Use the built-in checker to aim for a contrast ratio of at least
+            4.5:1 to ensure scanners can easily read it.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Where can I find the source code for this app?</summary>
+          <p>This project is completely open-source and transparent. You can view, audit, or contribute to the source
+            code on GitHub at <a href="https://github.com/1bl4z3r/qr" target="_blank" rel="noopener"
+              style="color: var(--md-primary); text-decoration: none; font-weight: 500;">https://github.com/1bl4z3r/qr</a>.
+          </p>
+        </details>
+      </div>
+
     </section>
   </main>
 
-  <footer class="site-footer shell"><p>Privacy-first: QR generation and scanning happen in your browser. No QR history is stored.</p></footer>
-  
-  <script defer src="assets/vendor/qr-code-styling.min.js"></script>
-  <script defer src="assets/vendor/html5-qrcode.min.js"></script>
-  <script defer src="index.js?v=2026-06-03"></script>
+  <nav class="m3-nav" role="navigation" aria-label="Main Application Navigation">
+    <button class="nav-item active" data-target="create-view"><span
+        class="material-symbols-outlined">qr_code_2</span><span>Create</span></button>
+    <button class="nav-item" data-target="scan-view"><span
+        class="material-symbols-outlined">document_scanner</span><span>Scan</span></button>
+    <button class="nav-item" data-target="settings-view"><span
+        class="material-symbols-outlined">settings</span><span>Settings</span></button>
+  </nav>
 
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -166,4 +249,5 @@
     }
   </script>
 </body>
+
 </html>
