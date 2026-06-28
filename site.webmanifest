@@ -1,8 +1,12 @@
 {
   "name": "QR Studio",
   "short_name": "QR Studio",
-  "start_url": "./index.html",
-  "display_override": ["fullscreen", "minimal-ui"],
+  "start_url": "https://qr.blzr.sbs",
+  "display_override": [
+    "fullscreen",
+    "minimal-ui",
+    "window-controls-overlay"
+  ],
   "display": "standalone",
   "background_color": "#FAFAFA",
   "theme_color": "#6750A4",
@@ -88,5 +92,28 @@
         }
       ]
     }
-  }
+  },
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://click.blzr.sbs/",
+      "id": "click"
+    }
+  ],
+  "id": "qr",
+  "description": "A free, offline-capable Progressive Web App to create and scan QR codes securely on your device.",
+  "dir": "auto",
+  "lang": "en",
+  "orientation": "portrait",
+  "categories": [
+    "developer",
+    "developer tools",
+    "development",
+    "education",
+    "network",
+    "networking",
+    "productivity",
+    "social",
+    "social networking"
+  ]
 }
