@@ -78,6 +78,13 @@
       <h1 id="scan-heading">Scan QR Code</h1>
       <div class="m3-card">
         <div id="reader" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000;"></div>
+        <div id="scanner-controls" style="display: none; margin-top: 12px; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--md-surface-variant); padding: 12px; border-radius: 8px;">
+            <select id="camera-select" class="m3-input" style="width: 100%; margin:0;" aria-label="Select Camera"></select>
+            <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+              <label for="qrbox-size" class="field-label" style="margin:0; white-space: nowrap;">Scan Box Size</label>
+              <input type="range" id="qrbox-size" min="100" max="500" value="250" style="flex: 1; cursor: pointer;">
+            </div>
+          </div>
         <div class="action-buttons">
           <button id="btn-start-scan" class="m3-button primary"><span class="material-symbols-outlined"
               aria-hidden="true">camera</span> Start Camera</button>
@@ -99,8 +106,9 @@
 
         <textarea id="scan-result-text" class="m3-input" rows="4" readonly></textarea>
         <div class="action-buttons">
-          <button id="btn-copy-result" class="m3-button primary">Copy</button>
-          <button id="btn-share-result" class="m3-button secondary">Share Text</button>
+            <button id="btn-open-link" class="m3-button primary" style="display: none;">Open Link</button>
+            <button id="btn-copy-result" class="m3-button secondary">Copy</button>
+            <button id="btn-share-result" class="m3-button secondary">Share Text</button>
         </div>
       </div>
     </section>
