@@ -75,43 +75,46 @@
     </section>
 
     <section id="scan-view" class="view" aria-labelledby="scan-heading">
-      <h1 id="scan-heading">Scan QR Code</h1>
-      <div class="m3-card">
-        <div id="reader" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000;"></div>
-        <div id="scanner-controls" style="display: none; margin-top: 12px; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--md-surface-variant); padding: 12px; border-radius: 8px;">
-            <select id="camera-select" class="m3-input" style="width: 100%; margin:0;" aria-label="Select Camera"></select>
-            <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-              <label for="qrbox-size" class="field-label" style="margin:0; white-space: nowrap;">Scan Box Size</label>
-              <input type="range" id="qrbox-size" min="100" max="500" value="250" style="flex: 1; cursor: pointer;">
+          <h1 id="scan-heading">Scan QR Code</h1>
+          <div class="m3-card">
+
+            <div class="action-buttons" style="margin-top: 0; margin-bottom: 16px;">
+              <button id="btn-start-scan" class="m3-button primary"><span class="material-symbols-outlined"
+                  aria-hidden="true">camera</span> Start Camera</button>
+              <button id="btn-stop-scan" class="m3-button" style="display:none;">Stop Camera</button>
+              <label for="qr-file-upload" class="m3-button secondary" style="margin:0;"><span
+                  class="material-symbols-outlined" aria-hidden="true">image</span> Load Image</label>
+              <input type="file" id="qr-file-upload" accept="image/*" style="display: none;">
+            </div>
+
+            <div id="scanner-controls" style="display: none; margin-bottom: 12px; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--md-surface-variant); padding: 12px; border-radius: 8px;">
+                <select id="camera-select" class="m3-input" style="width: 100%; margin:0;" aria-label="Select Camera"></select>
+                <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                  <label for="qrbox-size" class="field-label" style="margin:0; white-space: nowrap;">Scan Box Size</label>
+                  <input type="range" id="qrbox-size" min="100" max="500" value="250" style="flex: 1; cursor: pointer;">
+                </div>
+            </div>
+
+            <div id="reader" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000;"></div>
+          </div>
+
+          <div id="scan-result-card" class="m3-card" style="display: none;" aria-live="polite">
+            <button id="btn-clear-scan-result" class="icon-btn-close" aria-label="Clear Scanned Result"><span
+                class="material-symbols-outlined">close</span></button>
+            <h3>Decoded Result</h3>
+
+            <img id="scan-image-preview" src=""
+              style="display:none; width: 100px; height: 100px; object-fit: contain; border-radius: 8px; margin-bottom: 12px; background: #fff;"
+              alt="Uploaded QR Image">
+
+            <textarea id="scan-result-text" class="m3-input" rows="4" readonly></textarea>
+            <div class="action-buttons">
+                <button id="btn-open-link" class="m3-button primary" style="display: none;">Open Link</button>
+                <button id="btn-copy-result" class="m3-button secondary">Copy</button>
+                <button id="btn-share-result" class="m3-button secondary">Share Text</button>
             </div>
           </div>
-        <div class="action-buttons">
-          <button id="btn-start-scan" class="m3-button primary"><span class="material-symbols-outlined"
-              aria-hidden="true">camera</span> Start Camera</button>
-          <button id="btn-stop-scan" class="m3-button" style="display:none;">Stop Camera</button>
-          <label for="qr-file-upload" class="m3-button secondary" style="margin:0;"><span
-              class="material-symbols-outlined" aria-hidden="true">image</span> Load Image</label>
-          <input type="file" id="qr-file-upload" accept="image/*" style="display: none;">
-        </div>
-      </div>
-
-      <div id="scan-result-card" class="m3-card" style="display: none;" aria-live="polite">
-        <button id="btn-clear-scan-result" class="icon-btn-close" aria-label="Clear Scanned Result"><span
-            class="material-symbols-outlined">close</span></button>
-        <h3>Decoded Result</h3>
-
-        <img id="scan-image-preview" src=""
-          style="display:none; width: 100px; height: 100px; object-fit: contain; border-radius: 8px; margin-bottom: 12px; background: #fff;"
-          alt="Uploaded QR Image">
-
-        <textarea id="scan-result-text" class="m3-input" rows="4" readonly></textarea>
-        <div class="action-buttons">
-            <button id="btn-open-link" class="m3-button primary" style="display: none;">Open Link</button>
-            <button id="btn-copy-result" class="m3-button secondary">Copy</button>
-            <button id="btn-share-result" class="m3-button secondary">Share Text</button>
-        </div>
-      </div>
-    </section>
+        </section>
 
     <section id="settings-view" class="view" aria-labelledby="settings-heading">
       <h1 id="settings-heading">Settings & Customization</h1>

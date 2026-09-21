@@ -7,58 +7,29 @@ const formatIcalDate = (dt) =>
 const qrConfig = {
   text: {
     label: "Plain Text",
+    seoDescription: "Create a free, offline-capable plain text QR code to instantly share notes, serial numbers, or custom messages securely.",
     fields: [
-      {
-        id: "input-text",
-        type: "textarea",
-        placeholder: "Enter plain text...",
-        rows: 4,
-        ariaLabel: "Plain text input",
-      },
+      { id: "input-text", type: "textarea", placeholder: "Enter plain text...", rows: 4, ariaLabel: "Plain text input" },
     ],
     getPayload: (data) => data["input-text"],
   },
   url: {
     label: "URL / Website",
+    seoDescription: "Generate a free URL QR code with a built-in UTM builder to track campaigns and share website links instantly.",
     fields: [
-      {
-        id: "url-input",
-        type: "url",
-        placeholder: "https://example.com",
-        ariaLabel: "Website URL",
-      },
-      {
-        id: "url-src",
-        type: "text",
-        placeholder: "UTM Source (Optional)",
-        ariaLabel: "UTM Source",
-      },
-      {
-        id: "url-med",
-        type: "text",
-        placeholder: "UTM Medium (Optional)",
-        ariaLabel: "UTM Medium",
-      },
-      {
-        id: "url-name",
-        type: "text",
-        placeholder: "UTM Campaign Name (Optional)",
-        ariaLabel: "UTM Campaign Name",
-      },
+      { id: "url-input", type: "url", placeholder: "https://example.com", ariaLabel: "Website URL" },
+      { id: "url-src", type: "text", placeholder: "UTM Source (Optional)", ariaLabel: "UTM Source" },
+      { id: "url-med", type: "text", placeholder: "UTM Medium (Optional)", ariaLabel: "UTM Medium" },
+      { id: "url-name", type: "text", placeholder: "UTM Campaign Name (Optional)", ariaLabel: "UTM Campaign Name" },
     ],
     getPayload: (data) => {
       let baseUri = data["url-input"];
       if (!baseUri) return null;
       if (data["url-src"] || data["url-med"] || data["url-name"]) {
-        const url = new URL(
-          baseUri.startsWith("http") ? baseUri : "https://" + baseUri,
-        );
-        if (data["url-src"])
-          url.searchParams.append("utm_source", data["url-src"]);
-        if (data["url-med"])
-          url.searchParams.append("utm_medium", data["url-med"]);
-        if (data["url-name"])
-          url.searchParams.append("utm_campaign", data["url-name"]);
+        const url = new URL(baseUri.startsWith("http") ? baseUri : "https://" + baseUri);
+        if (data["url-src"]) url.searchParams.append("utm_source", data["url-src"]);
+        if (data["url-med"]) url.searchParams.append("utm_medium", data["url-med"]);
+        if (data["url-name"]) url.searchParams.append("utm_campaign", data["url-name"]);
         return url.toString();
       }
       return baseUri;
@@ -66,11 +37,10 @@ const qrConfig = {
   },
   upi: {
     label: "UPI Payment",
+    seoDescription: "Create a free UPI payment QR code to accept payments via VPA, Bank Account, Mobile Number, or Aadhaar mapping offline.",
     fields: [
       {
-        id: "upi-method",
-        type: "select",
-        ariaLabel: "Select UPI routing method",
+        id: "upi-method", type: "select", ariaLabel: "Select UPI routing method",
         options: [
           { value: "vpa", label: "UPI ID / VPA" },
           { value: "bank", label: "Bank Account + IFSC" },
@@ -82,106 +52,37 @@ const qrConfig = {
           const getEl = (id) => document.getElementById(id) || { style: {} };
           getEl("wrap-upi-id").style.display = v === "vpa" ? "block" : "none";
           getEl("wrap-upi-bank").style.display = v === "bank" ? "flex" : "none";
-          getEl("wrap-upi-aadhaar").style.display =
-            v === "aadhaar" ? "block" : "none";
-          getEl("wrap-upi-mobile").style.display =
-            v === "mobile" ? "block" : "none";
+          getEl("wrap-upi-aadhaar").style.display = v === "aadhaar" ? "block" : "none";
+          getEl("wrap-upi-mobile").style.display = v === "mobile" ? "block" : "none";
         },
       },
+      { id: "upi-id", type: "text", placeholder: "e.g., username@bank", wrapperId: "wrap-upi-id", ariaLabel: "UPI ID or VPA" },
       {
-        id: "upi-id",
-        type: "text",
-        placeholder: "e.g., username@bank",
-        wrapperId: "wrap-upi-id",
-        ariaLabel: "UPI ID or VPA",
-      },
-      {
-        id: "upi-bank",
-        type: "group",
-        wrapperId: "wrap-upi-bank",
-        style: "display:none;",
+        id: "upi-bank", type: "group", wrapperId: "wrap-upi-bank", style: "display:none;",
         fields: [
-          {
-            id: "upi-account",
-            type: "text",
-            placeholder: "Bank Account Number",
-            numericOnly: true,
-            inputmode: "numeric",
-            ariaLabel: "Bank Account Number",
-          },
-          {
-            id: "upi-ifsc",
-            type: "text",
-            placeholder: "IFSC Code",
-            ariaLabel: "IFSC Code",
-          },
+          { id: "upi-account", type: "text", placeholder: "Bank Account Number", numericOnly: true, inputmode: "numeric", ariaLabel: "Bank Account Number" },
+          { id: "upi-ifsc", type: "text", placeholder: "IFSC Code", ariaLabel: "IFSC Code" },
         ],
       },
+      { id: "upi-aadhaar", type: "text", placeholder: "[Aadhaar Redacted]", maxlength: "12", wrapperId: "wrap-upi-aadhaar", style: "display:none;", numericOnly: true, inputmode: "numeric", pattern: "[0-9]*", ariaLabel: "12-digit Aadhaar Number" },
+      { id: "upi-mobile", type: "tel", placeholder: "10-Digit Mobile Number", maxlength: "10", wrapperId: "wrap-upi-mobile", style: "display:none;", numericOnly: true, inputmode: "numeric", pattern: "[0-9]*", ariaLabel: "10-digit Mobile Number" },
+      { id: "upi-payee", type: "text", placeholder: "Payee Name", ariaLabel: "Payee Name" },
       {
-        id: "upi-aadhaar",
-        type: "text",
-        placeholder: "[Aadhaar Redacted]",
-        maxlength: "12",
-        wrapperId: "wrap-upi-aadhaar",
-        style: "display:none;",
-        numericOnly: true,
-        inputmode: "numeric",
-        pattern: "[0-9]*",
-        ariaLabel: "12-digit Aadhaar Number",
-      },
-      {
-        id: "upi-mobile",
-        type: "tel",
-        placeholder: "10-Digit Mobile Number",
-        maxlength: "10",
-        wrapperId: "wrap-upi-mobile",
-        style: "display:none;",
-        numericOnly: true,
-        inputmode: "numeric",
-        pattern: "[0-9]*",
-        ariaLabel: "10-digit Mobile Number",
-      },
-      {
-        id: "upi-payee",
-        type: "text",
-        placeholder: "Payee Name",
-        ariaLabel: "Payee Name",
-      },
-      {
-        id: "upi-amount",
-        type: "number",
-        placeholder: "Amount (Optional)",
-        ariaLabel: "Payment Amount in INR",
+        id: "upi-amount", type: "number", placeholder: "Amount (Optional)", ariaLabel: "Payment Amount in INR",
         onChange: (e) => {
           const splitWrap = document.getElementById("wrap-upi-split");
-          if (splitWrap)
-            splitWrap.style.display =
-              Number(e.target.value) > 1999 ? "block" : "none";
+          if (splitWrap) splitWrap.style.display = Number(e.target.value) > 1999 ? "block" : "none";
         },
       },
-      {
-        id: "upi-split",
-        type: "checkbox",
-        label: "Split into 1999 INR chunks",
-        wrapperId: "wrap-upi-split",
-        style: "display:none;",
-        ariaLabel: "Split large payments",
-      },
-      {
-        id: "upi-note",
-        type: "text",
-        placeholder: "Note (Optional)",
-        ariaLabel: "Payment Note",
-      },
+      { id: "upi-split", type: "checkbox", label: "Split into 1999 INR chunks", wrapperId: "wrap-upi-split", style: "display:none;", ariaLabel: "Split large payments" },
+      { id: "upi-note", type: "text", placeholder: "Note (Optional)", ariaLabel: "Payment Note" },
     ],
     getPayload: (data) => {
       const method = data["upi-method"];
       let pa = "";
       if (method === "vpa") pa = data["upi-id"]?.trim();
-      else if (method === "bank")
-        pa = `${data["upi-account"]?.trim()}@${data["upi-ifsc"]?.trim().toUpperCase()}.ifsc.npci`;
-      else if (method === "aadhaar")
-        pa = `${data["upi-aadhaar"]?.trim()}@aadhaar.npci`;
+      else if (method === "bank") pa = `${data["upi-account"]?.trim()}@${data["upi-ifsc"]?.trim().toUpperCase()}.ifsc.npci`;
+      else if (method === "aadhaar") pa = `${data["upi-aadhaar"]?.trim()}@aadhaar.npci`;
       else if (method === "mobile") {
         const mNum = data["upi-mobile"]?.trim();
         if (mNum?.length !== 10) return alert("Enter 10-digit mobile number.");
@@ -192,31 +93,20 @@ const qrConfig = {
       const pn = encodeURIComponent(data["upi-payee"]?.trim() || "Payee");
       const am = data["upi-amount"];
       const rawTn = data["upi-note"]?.trim() || "";
-
       let basePayload = `upi://pay?pa=${pa}&pn=${pn}&cu=INR`;
 
-      // Check if amount is > 2000 and the user checked the split box
       if (data["upi-split"] && am && Number(am) > 2000) {
         let total = Number(am);
         let chunks = [];
-        const totalChunks = Math.ceil(total / 1999); // Calculate X (total number of chunks)
-
+        const totalChunks = Math.ceil(total / 1999);
         for (let i = 1; i <= totalChunks; i++) {
           let chunkAm = Math.min(total, 1999);
-
-          // Append "1 of X", etc., to the user's note (or create the note if blank)
-          let chunkNote = rawTn
-            ? `${rawTn} ${i} of ${totalChunks}`
-            : `${i} of ${totalChunks}`;
-
-          chunks.push(
-            `${basePayload}&am=${chunkAm}&tn=${encodeURIComponent(chunkNote)}`,
-          );
+          let chunkNote = rawTn ? `${rawTn} ${i} of ${totalChunks}` : `${i} of ${totalChunks}`;
+          chunks.push(`${basePayload}&am=${chunkAm}&tn=${encodeURIComponent(chunkNote)}`);
           total -= chunkAm;
         }
         return chunks;
       } else {
-        // Standard single QR Generation
         let payload = basePayload;
         if (am) payload += `&am=${am}`;
         if (rawTn) payload += `&tn=${encodeURIComponent(rawTn)}`;
@@ -225,252 +115,65 @@ const qrConfig = {
     },
   },
   geo: {
-      label: "Location (Geo-coordinates)",
-      fields: [
-        { type: "group", fields: [
-          { id: "geo-lat", type: "text", placeholder: "Latitude (e.g., 40.7128)", inputmode: "decimal" },
-          { id: "geo-lng", type: "text", placeholder: "Longitude (e.g., -74.0060)", inputmode: "decimal" }
-        ]}
-      ],
-      getPayload: (data) => {
-        const lat = data['geo-lat']?.trim();
-        const lng = data['geo-lng']?.trim();
-        return (lat && lng) ? `geo:${lat},${lng}` : null;
-      }
-    },
+    label: "Location (Geo-coordinates)",
+    seoDescription: "Generate a free geolocation QR code to instantly share map coordinates and precise locations.",
+    fields: [
+      { type: "group", fields: [
+        { id: "geo-lat", type: "text", placeholder: "Latitude (e.g., 40.7128)", inputmode: "decimal" },
+        { id: "geo-lng", type: "text", placeholder: "Longitude (e.g., -74.0060)", inputmode: "decimal" }
+      ]}
+    ],
+    getPayload: (data) => {
+      const lat = data['geo-lat']?.trim();
+      const lng = data['geo-lng']?.trim();
+      return (lat && lng) ? `geo:${lat},${lng}` : null;
+    }
+  },
   wifi: {
     label: "Wi-Fi Network",
+    seoDescription: "Create a free, offline-capable Wi-Fi QR code to instantly share your network credentials without typing passwords.",
     fields: [
-      {
-        id: "wifi-ssid",
-        type: "text",
-        placeholder: "Network Name (SSID)",
-        ariaLabel: "Wi-Fi Network Name",
-      },
-      {
-        id: "wifi-pass",
-        type: "text",
-        placeholder: "Password",
-        ariaLabel: "Wi-Fi Password",
-      },
-      {
-        id: "wifi-sec",
-        type: "select",
-        options: [
-          { value: "WPA", label: "WPA/WPA2" },
-          { value: "WEP", label: "WEP" },
-          { value: "nopass", label: "None" },
-        ],
-        ariaLabel: "Wi-Fi Security Type",
-      },
-      {
-        id: "wifi-hidden",
-        type: "checkbox",
-        label: "Hidden Network",
-        ariaLabel: "Is network hidden?",
-      },
+      { id: "wifi-ssid", type: "text", placeholder: "Network Name (SSID)", ariaLabel: "Wi-Fi Network Name" },
+      { id: "wifi-pass", type: "text", placeholder: "Password", ariaLabel: "Wi-Fi Password" },
+      { id: "wifi-sec", type: "select", options: [{ value: "WPA", label: "WPA/WPA2" }, { value: "WEP", label: "WEP" }, { value: "nopass", label: "None" }], ariaLabel: "Wi-Fi Security Type" },
+      { id: "wifi-hidden", type: "checkbox", label: "Hidden Network", ariaLabel: "Is network hidden?" },
     ],
-    getPayload: (data) =>
-      `WIFI:S:${data["wifi-ssid"]};T:${data["wifi-sec"]};P:${data["wifi-pass"]};H:${data["wifi-hidden"] ? "true" : "false"};;`,
+    getPayload: (data) => `WIFI:S:${data["wifi-ssid"]};T:${data["wifi-sec"]};P:${data["wifi-pass"]};H:${data["wifi-hidden"] ? "true" : "false"};;`,
   },
   vcard: {
     label: "Contact (vCard)",
+    seoDescription: "Generate a free vCard QR code to instantly share your contact information, phone numbers, and social links.",
     fields: [
-      {
-        type: "group",
-        fields: [
-          { id: "vcard-prefix", type: "text", placeholder: "Prefix" },
-          { id: "vcard-first", type: "text", placeholder: "First Name *" },
-          { id: "vcard-middle", type: "text", placeholder: "Middle Name" },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          { id: "vcard-last", type: "text", placeholder: "Last Name *" },
-          { id: "vcard-suffix", type: "text", placeholder: "Suffix" },
-          { id: "vcard-nickname", type: "text", placeholder: "Nickname" },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          {
-            id: "vcard-phone-home",
-            type: "tel",
-            placeholder: "Personal Phone *",
-          },
-          {
-            id: "vcard-email-home",
-            type: "email",
-            placeholder: "Personal Email *",
-          },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          { id: "vcard-phone-work", type: "tel", placeholder: "Work Phone" },
-          { id: "vcard-email-work", type: "email", placeholder: "Work Email" },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          { id: "vcard-org", type: "text", placeholder: "Organization" },
-          { id: "vcard-title", type: "text", placeholder: "Title" },
-          { id: "vcard-role", type: "text", placeholder: "Role" },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          {
-            id: "vcard-gender",
-            type: "select",
-            label: "Gender",
-            ariaLabel: "Gender",
-            options: [
-              { value: "", label: "Select Gender" },
-              { value: "M", label: "Male" },
-              { value: "F", label: "Female" },
-              { value: "O", label: "Other" },
-            ],
-          },
-          { id: "vcard-bday", type: "date", label: "Birthday" },
-          { id: "vcard-anniversary", type: "date", label: "Anniversary" },
-        ],
-      },
+      { type: "group", fields: [{ id: "vcard-prefix", type: "text", placeholder: "Prefix" }, { id: "vcard-first", type: "text", placeholder: "First Name *" }, { id: "vcard-middle", type: "text", placeholder: "Middle Name" }] },
+      { type: "group", fields: [{ id: "vcard-last", type: "text", placeholder: "Last Name *" }, { id: "vcard-suffix", type: "text", placeholder: "Suffix" }, { id: "vcard-nickname", type: "text", placeholder: "Nickname" }] },
+      { type: "group", fields: [{ id: "vcard-phone-home", type: "tel", placeholder: "Personal Phone *" }, { id: "vcard-email-home", type: "email", placeholder: "Personal Email *" }] },
+      { type: "group", fields: [{ id: "vcard-phone-work", type: "tel", placeholder: "Work Phone" }, { id: "vcard-email-work", type: "email", placeholder: "Work Email" }] },
+      { type: "group", fields: [{ id: "vcard-org", type: "text", placeholder: "Organization" }, { id: "vcard-title", type: "text", placeholder: "Title" }, { id: "vcard-role", type: "text", placeholder: "Role" }] },
+      { type: "group", fields: [{ id: "vcard-gender", type: "select", label: "Gender", ariaLabel: "Gender", options: [{ value: "", label: "Select Gender" }, { value: "M", label: "Male" }, { value: "F", label: "Female" }, { value: "O", label: "Other" }] }, { id: "vcard-bday", type: "date", label: "Birthday" }, { id: "vcard-anniversary", type: "date", label: "Anniversary" }] },
 
-      // Home Address
-      {
-        id: "vcard-adr-home-label",
-        type: "text",
-        placeholder: "Home Address Label (e.g., Summer House)",
-      },
+      { id: "vcard-adr-home-label", type: "text", placeholder: "Home Address Label (e.g., Summer House)" },
       { id: "vcard-adr-home-street", type: "text", placeholder: "Home Street" },
-      {
-        type: "group",
-        fields: [
-          { id: "vcard-adr-home-city", type: "text", placeholder: "Home City" },
-          {
-            id: "vcard-adr-home-state",
-            type: "text",
-            placeholder: "Home State",
-          },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          {
-            id: "vcard-adr-home-zip",
-            type: "text",
-            placeholder: "Home Postal Code",
-          },
-          {
-            id: "vcard-adr-home-country",
-            type: "text",
-            placeholder: "Home Country",
-          },
-        ],
-      },
+      { type: "group", fields: [{ id: "vcard-adr-home-city", type: "text", placeholder: "Home City" }, { id: "vcard-adr-home-state", type: "text", placeholder: "Home State" }] },
+      { type: "group", fields: [{ id: "vcard-adr-home-zip", type: "text", placeholder: "Home Postal Code" }, { id: "vcard-adr-home-country", type: "text", placeholder: "Home Country" }] },
 
-      // Work Address
-      {
-        id: "vcard-adr-work-label",
-        type: "text",
-        placeholder: "Work Address Label (e.g., HQ)",
-      },
+      { id: "vcard-adr-work-label", type: "text", placeholder: "Work Address Label (e.g., HQ)" },
       { id: "vcard-adr-work-street", type: "text", placeholder: "Work Street" },
-      {
-        type: "group",
-        fields: [
-          { id: "vcard-adr-work-city", type: "text", placeholder: "Work City" },
-          {
-            id: "vcard-adr-work-state",
-            type: "text",
-            placeholder: "Work State",
-          },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          {
-            id: "vcard-adr-work-zip",
-            type: "text",
-            placeholder: "Work Postal Code",
-          },
-          {
-            id: "vcard-adr-work-country",
-            type: "text",
-            placeholder: "Work Country",
-          },
-        ],
-      },
+      { type: "group", fields: [{ id: "vcard-adr-work-city", type: "text", placeholder: "Work City" }, { id: "vcard-adr-work-state", type: "text", placeholder: "Work State" }] },
+      { type: "group", fields: [{ id: "vcard-adr-work-zip", type: "text", placeholder: "Work Postal Code" }, { id: "vcard-adr-work-country", type: "text", placeholder: "Work Country" }] },
 
-      // Links & Socials
-      {
-        type: "group",
-        fields: [
-          {
-            id: "vcard-url-personal",
-            type: "url",
-            placeholder: "Personal URL",
-          },
-          { id: "vcard-url-work", type: "url", placeholder: "Work URL" },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          {
-            id: "vcard-linkedin",
-            type: "url",
-            placeholder: "LinkedIn Profile URL",
-          },
-          {
-            id: "vcard-twitter",
-            type: "url",
-            placeholder: "Twitter Profile URL",
-          },
-        ],
-      },
-      {
-        type: "group",
-        fields: [
-          {
-            id: "vcard-instagram",
-            type: "url",
-            placeholder: "Instagram Profile URL",
-          },
-          {
-            id: "vcard-url-custom",
-            type: "text",
-            placeholder: "Custom Links (comma separated)",
-          },
-        ],
-      },
-
-      {
-        id: "vcard-note",
-        type: "textarea",
-        placeholder: "Notes / Details...",
-        rows: 3,
-      },
+      { type: "group", fields: [{ id: "vcard-url-personal", type: "url", placeholder: "Personal URL" }, { id: "vcard-url-work", type: "url", placeholder: "Work URL" }] },
+      { type: "group", fields: [{ id: "vcard-linkedin", type: "url", placeholder: "LinkedIn Profile URL" }, { id: "vcard-twitter", type: "url", placeholder: "Twitter Profile URL" }] },
+      { type: "group", fields: [{ id: "vcard-instagram", type: "url", placeholder: "Instagram Profile URL" }, { id: "vcard-url-custom", type: "text", placeholder: "Custom Links (comma separated)" }] },
+      { id: "vcard-note", type: "textarea", placeholder: "Notes / Details...", rows: 3 },
     ],
     getPayload: (data) => {
-      // 1. Validate Mandatory Fields
       const first = data["vcard-first"]?.trim();
       const last = data["vcard-last"]?.trim();
       const emailHome = data["vcard-email-home"]?.trim();
       const phoneHome = data["vcard-phone-home"]?.trim();
 
       if (!first || !last || !emailHome || !phoneHome) {
-        alert(
-          "First Name, Last Name, Personal Email, and Personal Phone are mandatory.",
-        );
+        alert("First Name, Last Name, Personal Email, and Personal Phone are mandatory.");
         return null;
       }
 
@@ -479,39 +182,26 @@ const qrConfig = {
       const suffix = data["vcard-suffix"]?.trim() || "";
 
       let payload = `BEGIN:VCARD\nVERSION:3.0\n`;
-
-      // Name Construction (N: Last;First;Middle;Prefix;Suffix)
       payload += `N:${last};${first};${middle};${prefix};${suffix}\n`;
       let fn = [prefix, first, middle, last, suffix].filter(Boolean).join(" ");
       payload += `FN:${fn}\n`;
 
-      // Demographics & Professional
-      if (data["vcard-nickname"])
-        payload += `NICKNAME:${data["vcard-nickname"].trim()}\n`;
+      if (data["vcard-nickname"]) payload += `NICKNAME:${data["vcard-nickname"].trim()}\n`;
       if (data["vcard-gender"]) payload += `GENDER:${data["vcard-gender"]}\n`;
       if (data["vcard-org"]) payload += `ORG:${data["vcard-org"].trim()}\n`;
-      if (data["vcard-title"])
-        payload += `TITLE:${data["vcard-title"].trim()}\n`;
+      if (data["vcard-title"]) payload += `TITLE:${data["vcard-title"].trim()}\n`;
       if (data["vcard-role"]) payload += `ROLE:${data["vcard-role"].trim()}\n`;
 
-      // Phone & Email
       payload += `TEL;TYPE=CELL:${phoneHome}\n`;
       payload += `EMAIL;TYPE=HOME:${emailHome}\n`;
-      if (data["vcard-phone-work"])
-        payload += `TEL;TYPE=WORK:${data["vcard-phone-work"].trim()}\n`;
-      if (data["vcard-email-work"])
-        payload += `EMAIL;TYPE=WORK:${data["vcard-email-work"].trim()}\n`;
+      if (data["vcard-phone-work"]) payload += `TEL;TYPE=WORK:${data["vcard-phone-work"].trim()}\n`;
+      if (data["vcard-email-work"]) payload += `EMAIL;TYPE=WORK:${data["vcard-email-work"].trim()}\n`;
 
-      // Dates
       if (data["vcard-bday"]) payload += `BDAY:${data["vcard-bday"]}\n`;
-      if (data["vcard-anniversary"])
-        payload += `ANNIVERSARY:${data["vcard-anniversary"]}\n`;
+      if (data["vcard-anniversary"]) payload += `ANNIVERSARY:${data["vcard-anniversary"]}\n`;
 
-      // Address Formatter
-      const formatAdr = (street, city, state, zip, country) =>
-        `;;${street || ""};${city || ""};${state || ""};${zip || ""};${country || ""}`;
+      const formatAdr = (street, city, state, zip, country) => `;;${street || ""};${city || ""};${state || ""};${zip || ""};${country || ""}`;
 
-      // Home Address (with Apple Address Book custom label support mapping)
       const homeStreet = data["vcard-adr-home-street"]?.trim();
       const homeCity = data["vcard-adr-home-city"]?.trim();
       const homeState = data["vcard-adr-home-state"]?.trim();
@@ -527,7 +217,6 @@ const qrConfig = {
         }
       }
 
-      // Work Address
       const workStreet = data["vcard-adr-work-street"]?.trim();
       const workCity = data["vcard-adr-work-city"]?.trim();
       const workState = data["vcard-adr-work-state"]?.trim();
@@ -543,27 +232,18 @@ const qrConfig = {
         }
       }
 
-      // URLs & Social Profiles
-      if (data["vcard-url-personal"])
-        payload += `URL;TYPE=HOME:${data["vcard-url-personal"].trim()}\n`;
-      if (data["vcard-url-work"])
-        payload += `URL;TYPE=WORK:${data["vcard-url-work"].trim()}\n`;
-      if (data["vcard-linkedin"])
-        payload += `X-SOCIALPROFILE;TYPE=linkedin:${data["vcard-linkedin"].trim()}\n`;
-      if (data["vcard-twitter"])
-        payload += `X-SOCIALPROFILE;TYPE=twitter:${data["vcard-twitter"].trim()}\n`;
-      if (data["vcard-instagram"])
-        payload += `X-SOCIALPROFILE;TYPE=instagram:${data["vcard-instagram"].trim()}\n`;
+      if (data["vcard-url-personal"]) payload += `URL;TYPE=HOME:${data["vcard-url-personal"].trim()}\n`;
+      if (data["vcard-url-work"]) payload += `URL;TYPE=WORK:${data["vcard-url-work"].trim()}\n`;
+      if (data["vcard-linkedin"]) payload += `X-SOCIALPROFILE;TYPE=linkedin:${data["vcard-linkedin"].trim()}\n`;
+      if (data["vcard-twitter"]) payload += `X-SOCIALPROFILE;TYPE=twitter:${data["vcard-twitter"].trim()}\n`;
+      if (data["vcard-instagram"]) payload += `X-SOCIALPROFILE;TYPE=instagram:${data["vcard-instagram"].trim()}\n`;
 
-      // Handling Comma-separated Custom URLs
       if (data["vcard-url-custom"]) {
-        const links = data["vcard-url-custom"].split(",");
-        links.forEach((link) => {
+        data["vcard-url-custom"].split(",").forEach((link) => {
           if (link.trim()) payload += `URL:${link.trim()}\n`;
         });
       }
 
-      // Notes (Newlines must be escaped for vCard)
       if (data["vcard-note"]) {
         let note = data["vcard-note"].replace(/\n/g, "\\n");
         payload += `NOTE:${note}\n`;
@@ -575,107 +255,45 @@ const qrConfig = {
   },
   email: {
     label: "Email",
+    seoDescription: "Create a free email QR code with pre-filled recipient, subject, and body text for instant communication.",
     fields: [
-      {
-        id: "email-address",
-        type: "email",
-        placeholder: "Recipient Email",
-        ariaLabel: "Recipient Email Address",
-      },
-      {
-        id: "email-sub",
-        type: "text",
-        placeholder: "Subject",
-        ariaLabel: "Email Subject",
-      },
-      {
-        id: "email-body",
-        type: "textarea",
-        placeholder: "Body Text",
-        rows: 4,
-        ariaLabel: "Email Body Text",
-      },
+      { id: "email-address", type: "email", placeholder: "Recipient Email", ariaLabel: "Recipient Email Address" },
+      { id: "email-sub", type: "text", placeholder: "Subject", ariaLabel: "Email Subject" },
+      { id: "email-body", type: "textarea", placeholder: "Body Text", rows: 4, ariaLabel: "Email Body Text" },
     ],
-    getPayload: (data) =>
-      `mailto:${data["email-address"]}?subject=${encodeURIComponent(data["email-sub"] || "")}&body=${encodeURIComponent(data["email-body"] || "")}`,
+    getPayload: (data) => `mailto:${data["email-address"]}?subject=${encodeURIComponent(data["email-sub"] || "")}&body=${encodeURIComponent(data["email-body"] || "")}`,
   },
   sms: {
     label: "Phone / SMS",
+    seoDescription: "Generate a free Phone/SMS QR code to instantly send pre-filled text messages to a specific phone number.",
     fields: [
-      {
-        id: "sms-phone",
-        type: "tel",
-        placeholder: "Phone Number",
-        numericOnly: true,
-        ariaLabel: "Phone Number",
-      },
-      {
-        id: "sms-checkbox",
-        type: "checkbox",
-        label: "Format as SMS",
-        checked: true,
-        ariaLabel: "Format output as SMS instead of phone call",
+      { id: "sms-phone", type: "tel", placeholder: "Phone Number", numericOnly: true, ariaLabel: "Phone Number" },
+      { id: "sms-checkbox", type: "checkbox", label: "Format as SMS", checked: true, ariaLabel: "Format output as SMS instead of phone call",
         onChange: (e) => {
           const msgBox = document.getElementById("sms-msg");
           if (msgBox) msgBox.disabled = !e.target.checked;
         },
       },
-      {
-        id: "sms-msg",
-        type: "textarea",
-        placeholder: "Message content...",
-        rows: 3,
-        ariaLabel: "SMS Message Content",
-      },
+      { id: "sms-msg", type: "textarea", placeholder: "Message content...", rows: 3, ariaLabel: "SMS Message Content" },
     ],
-    getPayload: (data) =>
-      data["sms-checkbox"]
-        ? `smsto:${data["sms-phone"]}:${data["sms-msg"] || ""}`
-        : `tel:${data["sms-phone"]}`,
+    getPayload: (data) => data["sms-checkbox"] ? `smsto:${data["sms-phone"]}:${data["sms-msg"] || ""}` : `tel:${data["sms-phone"]}`,
   },
   event: {
     label: "Calendar Event",
+    seoDescription: "Create a free calendar event QR code to instantly share meeting details, dates, and locations.",
     fields: [
-      {
-        id: "event-title",
-        type: "text",
-        placeholder: "Event Title",
-        ariaLabel: "Event Title",
-      },
-      {
-        id: "event-loc",
-        type: "text",
-        placeholder: "Location",
-        ariaLabel: "Event Location",
-      },
-      {
-        id: "event-desc",
-        type: "textarea",
-        placeholder: "Description",
-        rows: 3,
-        ariaLabel: "Event Description",
-      },
-      {
-        id: "event-start",
-        type: "datetime-local",
-        label: "Start",
-        ariaLabel: "Event Start Date and Time",
-      },
-      {
-        id: "event-end",
-        type: "datetime-local",
-        label: "End",
-        ariaLabel: "Event End Date and Time",
-      },
+      { id: "event-title", type: "text", placeholder: "Event Title", ariaLabel: "Event Title" },
+      { id: "event-loc", type: "text", placeholder: "Location", ariaLabel: "Event Location" },
+      { id: "event-desc", type: "textarea", placeholder: "Description", rows: 3, ariaLabel: "Event Description" },
+      { id: "event-start", type: "datetime-local", label: "Start", ariaLabel: "Event Start Date and Time" },
+      { id: "event-end", type: "datetime-local", label: "End", ariaLabel: "Event End Date and Time" },
     ],
     getPayload: (data) => {
       let payload = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${data["event-title"]}\n`;
       if (data["event-loc"]) payload += `LOCATION:${data["event-loc"]}\n`;
       if (data["event-desc"]) payload += `DESCRIPTION:${data["event-desc"]}\n`;
-      if (data["event-start"])
-        payload += `DTSTART:${formatIcalDate(data["event-start"])}\n`;
-      if (data["event-end"])
-        payload += `DTEND:${formatIcalDate(data["event-end"])}\n`;
+      if (data["event-start"]) payload += `DTSTART:${formatIcalDate(data["event-start"])}\n`;
+      if (data["event-end"]) payload += `DTEND:${formatIcalDate(data["event-end"])}\n`;
       return payload + `END:VEVENT\nEND:VCALENDAR`;
     },
   },
@@ -756,18 +374,13 @@ function createFieldNode(field) {
         e.target.value = e.target.value.replace(/\D/g, "");
       });
     }
-    if (field.onChange) {
-      inputEl.addEventListener("input", field.onChange);
-    }
+    if (field.onChange) inputEl.addEventListener("input", field.onChange);
     wrapper.appendChild(inputEl);
   }
 
   inputEl.id = field.id;
   if (field.placeholder) inputEl.placeholder = field.placeholder;
-  inputEl.setAttribute(
-    "aria-label",
-    field.ariaLabel || field.label || field.placeholder || "Input Field",
-  );
+  inputEl.setAttribute("aria-label", field.ariaLabel || field.label || field.placeholder || "Input Field");
 
   return wrapper;
 }
@@ -778,23 +391,9 @@ function triggerInitialChanges(fields) {
       triggerInitialChanges(field.fields);
     } else if (field.onChange) {
       const el = document.getElementById(field.id);
-      if (el)
-        el.dispatchEvent(
-          new Event(
-            field.type === "select" || field.type === "checkbox"
-              ? "change"
-              : "input",
-          ),
-        );
+      if (el) el.dispatchEvent(new Event(field.type === "select" || field.type === "checkbox" ? "change" : "input"));
     }
   });
-}
-
-function renderForm(typeKey) {
-  formContainer.innerHTML = "";
-  const fields = qrConfig[typeKey].fields;
-  fields.forEach((field) => formContainer.appendChild(createFieldNode(field)));
-  triggerInitialChanges(fields);
 }
 
 function extractFormData(fields, dataObj = {}) {
@@ -803,20 +402,56 @@ function extractFormData(fields, dataObj = {}) {
       extractFormData(field.fields, dataObj);
     } else {
       const el = document.getElementById(field.id);
-      if (el)
-        dataObj[field.id] = field.type === "checkbox" ? el.checked : el.value;
+      if (el) dataObj[field.id] = field.type === "checkbox" ? el.checked : el.value;
     }
   });
   return dataObj;
 }
 
-typeSelect.addEventListener("change", (e) => renderForm(e.target.value));
-renderForm(Object.keys(qrConfig)[0]);
+// Dynamically update SEO Metadata
+function updateMetadata(typeKey) {
+  const config = qrConfig[typeKey];
+  if (config) {
+    document.title = `Generate ${config.label} QR Code | QR Studio`;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.name = "description";
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.content = config.seoDescription;
+  }
+}
+
+function renderForm(typeKey) {
+  formContainer.innerHTML = "";
+  const fields = qrConfig[typeKey].fields;
+
+  // OPTIMIZATION: Use DocumentFragment for batched DOM painting
+  const fragment = document.createDocumentFragment();
+  fields.forEach((field) => fragment.appendChild(createFieldNode(field)));
+  formContainer.appendChild(fragment);
+
+  typeSelect.value = typeKey;
+  triggerInitialChanges(fields);
+  updateMetadata(typeKey);
+}
+
+// Handle Manual Dropdown Selection
+typeSelect.addEventListener("change", (e) => {
+  const newType = e.target.value;
+  renderForm(newType);
+
+  // Push state to update URL without reloading
+  const newUrl = new URL(window.location);
+  newUrl.searchParams.set("action", "create");
+  newUrl.searchParams.set("type", newType);
+  window.history.pushState({ action: "create", type: newType }, "", newUrl);
+});
 
 // ==========================================
 // 3. CONTRAST MATH & PERSISTENCE
 // ==========================================
-// Math to calculate relative luminance & contrast ratio
 function hexToRgb(hex) {
   let r = parseInt(hex.slice(1, 3), 16);
   let g = parseInt(hex.slice(3, 5), 16);
@@ -856,8 +491,7 @@ function updateContrastUI() {
     contrastSub.innerText = "Passable, but poor cameras might struggle.";
   } else {
     contrastText.innerHTML = `❌ Contrast: ${ratio}:1 (Poor)`;
-    contrastSub.innerText =
-      "Warning: Scanners may fail to read this QR code. Increase contrast.";
+    contrastSub.innerText = "Warning: Scanners may fail to read this QR code. Increase contrast.";
   }
 }
 
@@ -869,17 +503,33 @@ fgInput.value = localStorage.getItem("qr_fg") || "#000000";
 bgInput.value = localStorage.getItem("qr_bg") || "#ffffff";
 ecInput.value = localStorage.getItem("qr_ec") || "M";
 
-const saveSettings = () => {
+// OPTIMIZATION: Debounce function to prevent local storage I/O spam
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+const saveSettingsDebounced = debounce(() => {
   localStorage.setItem("qr_fg", fgInput.value);
   localStorage.setItem("qr_bg", bgInput.value);
   localStorage.setItem("qr_ec", ecInput.value);
+}, 300);
+
+const handleColorChange = () => {
   updateContrastUI();
+  saveSettingsDebounced();
 };
 
-fgInput.addEventListener("input", saveSettings);
-bgInput.addEventListener("input", saveSettings);
-ecInput.addEventListener("change", saveSettings);
-updateContrastUI(); // Init contrast on load
+fgInput.addEventListener("input", handleColorChange);
+bgInput.addEventListener("input", handleColorChange);
+ecInput.addEventListener("change", () => {
+  updateContrastUI();
+  saveSettingsDebounced();
+});
+updateContrastUI();
 
 // App Theme Logic
 const appThemeSelector = document.getElementById("app-theme-selector");
@@ -888,8 +538,7 @@ appThemeSelector.value = localStorage.getItem("qr_app_theme") || "system";
 appThemeSelector.addEventListener("change", (e) => {
   const selectedTheme = e.target.value;
   localStorage.setItem("qr_app_theme", selectedTheme);
-  if (selectedTheme === "system")
-    document.documentElement.removeAttribute("data-theme");
+  if (selectedTheme === "system") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme", selectedTheme);
 });
 
@@ -904,20 +553,17 @@ if (savedLogoData) {
   logoPreviewContainer.style.display = "flex";
 }
 
-// Logo Logic
 logoInput.addEventListener('change', (e) => {
   if (e.target.files[0]) {
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        // Compress image using canvas
         const canvas = document.createElement('canvas');
-        const MAX_SIZE = 200; // 200px is highly optimal for a QR center logo
+        const MAX_SIZE = 200;
         let width = img.width;
         let height = img.height;
 
-        // Calculate aspect ratio preserving dimensions
         if (width > height && width > MAX_SIZE) {
           height *= MAX_SIZE / width;
           width = MAX_SIZE;
@@ -931,7 +577,6 @@ logoInput.addEventListener('change', (e) => {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert back to base64 at 80% WebP quality
         savedLogoData = canvas.toDataURL('image/webp', 0.8);
 
         try {
@@ -948,7 +593,6 @@ logoInput.addEventListener('change', (e) => {
   }
 });
 
-// Settings - Clear Logo Event
 document.getElementById("btn-clear-logo").addEventListener("click", () => {
   savedLogoData = null;
   localStorage.removeItem("qr_logo");
@@ -959,9 +603,6 @@ document.getElementById("btn-clear-logo").addEventListener("click", () => {
 // ==========================================
 // 4. GENERATION & SCANNING LOGIC
 // ==========================================
-// if ('serviceWorker' in navigator) {
-//   window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js'));
-// }
 
 const navItems = document.querySelectorAll(".nav-item");
 const views = document.querySelectorAll(".view");
@@ -1034,9 +675,7 @@ document.getElementById("btn-generate").addEventListener("click", async () => {
   const rawData = extractFormData(qrConfig[typeKey].fields);
   let qrPayloads = qrConfig[typeKey].getPayload(rawData);
 
-  if (!qrPayloads)
-    return alert("Please provide valid data to generate the QR.");
-
+  if (!qrPayloads) return alert("Please provide valid data to generate the QR.");
   if (!Array.isArray(qrPayloads)) qrPayloads = [qrPayloads];
 
   currentQrInstances = [];
@@ -1048,22 +687,18 @@ document.getElementById("btn-generate").addEventListener("click", async () => {
   } else {
     try {
       const instance = createQRInstance(qrPayloads[0]);
-      await instance.getRawData("png"); // Validate data size dynamically against current Error Correction limits
+      await instance.getRawData("png");
       container.style.flexDirection = "row";
       instance.append(container);
       currentQrInstances.push(instance);
     } catch (err) {
       console.warn("QR length overflow, chunking data...", err);
       container.innerHTML = "";
-      const chunks = chunkString(qrPayloads[0], 800); // 800 chars is deeply safe for 'H' error correction
+      const chunks = chunkString(qrPayloads[0], 800);
       renderAccordionQRs(chunks, container);
     }
   }
-
-  setTimeout(
-    () => resultCard.scrollIntoView({ behavior: "smooth", block: "start" }),
-    100,
-  );
+  setTimeout(() => resultCard.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 });
 
 document.getElementById("btn-clear-qr-result").addEventListener("click", () => {
@@ -1076,47 +711,32 @@ document.getElementById("btn-download").onclick = () => {
   currentQrInstances.forEach((inst, idx) => {
     setTimeout(() => {
       inst.download({
-        name:
-          currentQrInstances.length > 1
-            ? `QR_${typeSelect.value}_${Date.now()}_part${idx + 1}`
-            : `QR_${typeSelect.value}_${Date.now()}`,
+        name: currentQrInstances.length > 1 ? `QR_${typeSelect.value}_${Date.now()}_part${idx + 1}` : `QR_${typeSelect.value}_${Date.now()}`,
         extension: "png",
       });
-    }, idx * 300); // Stagger to prevent ad-blockers/browsers from canceling batched downloads
+    }, idx * 300);
   });
 };
 
+// OPTIMIZATION: Mapped Promises Array for batched Canvas processing
 document.getElementById("btn-share-qr").onclick = async () => {
-  const canvases = Array.from(
-    document.getElementById("qr-canvas-container").querySelectorAll("canvas"),
-  );
+  const canvases = Array.from(document.getElementById("qr-canvas-container").querySelectorAll("canvas"));
   if (canvases.length > 0 && navigator.canShare) {
-    const files = await Promise.all(
-      canvases.map((canvas, index) => {
-        return new Promise((resolve) => {
-          canvas.toBlob((blob) =>
-            resolve(
-              new File(
-                [blob],
-                canvases.length > 1
-                  ? `qrcode_part${index + 1}.png`
-                  : "qrcode.png",
-                { type: "image/png" },
-              ),
-            ),
-          );
-        });
-      }),
-    );
-
     try {
+      const files = await Promise.all(
+        canvases.map((canvas, index) => {
+          return new Promise((resolve) => {
+            canvas.toBlob((blob) => resolve(new File([blob], canvases.length > 1 ? `qrcode_part${index + 1}.png` : "qrcode.png", { type: "image/png" })));
+          });
+        })
+      );
       await navigator.share({
         title: "QR Code",
         text: "QR created by QR Studio: qr.blzr.sbs",
         files: files,
       });
     } catch (err) {
-      console.log("Share failed");
+      console.log("Share failed or canceled.");
     }
   } else alert("Sharing not supported on this browser.");
 };
@@ -1134,22 +754,17 @@ let cameras = [];
 let currentCameraId = null;
 
 function handleScanSuccess(decodedText, isFile = false) {
-  // 1. Haptic Feedback (Supported on most modern devices)
   if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
 
   scanResultCard.style.display = 'block';
   scanResultText.value = decodedText;
 
-  // 2. Smart Contextual Action Button
   const openLinkBtn = document.getElementById('btn-open-link');
   const txt = decodedText.trim();
 
-  // Detects standard web links or native app intents (geo, mailto, tel, smsto, upi, wifi)
   if (txt.match(/^(https?|geo|mailto|tel|smsto|upi|WIFI):/i)) {
     openLinkBtn.style.display = 'inline-flex';
     openLinkBtn.innerText = txt.toLowerCase().startsWith('http') ? 'Open Link' : 'Launch App';
-
-    // Override onClick to handle special intents appropriately
     openLinkBtn.onclick = () => {
       if (txt.toUpperCase().startsWith('WIFI:')) {
         alert("Copy the password manually, then use this data to connect via your device Wi-Fi settings.");
@@ -1161,7 +776,7 @@ function handleScanSuccess(decodedText, isFile = false) {
     openLinkBtn.style.display = 'none';
   }
 
-  if (!isFile) scanImagePreview.style.display = 'none'; // Only show image preview if uploaded
+  if (!isFile) scanImagePreview.style.display = 'none';
 
   if(html5QrCode?.isScanning) {
     html5QrCode.stop();
@@ -1170,6 +785,29 @@ function handleScanSuccess(decodedText, isFile = false) {
     scannerControls.style.display = 'none';
   }
   scanResultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// OPTIMIZATION: Clean, fading DOM error inject for camera permissions
+function showCameraError() {
+  document.getElementById("btn-start-scan").style.display = "inline-flex";
+  document.getElementById("btn-stop-scan").style.display = "none";
+  scannerControls.style.display = "none";
+
+  let errSpan = document.getElementById("camera-err-msg");
+  if (!errSpan) {
+    errSpan = document.createElement("div");
+    errSpan.id = "camera-err-msg";
+    errSpan.style.cssText = "color: #ff4d4d; font-weight: 500; margin-bottom: 12px; text-align: center; transition: opacity 0.5s;";
+    document.getElementById("reader").insertAdjacentElement('beforebegin', errSpan);
+  }
+  errSpan.innerText = "Camera access denied or in use.";
+  errSpan.style.opacity = "1";
+  errSpan.style.display = "block";
+
+  setTimeout(() => {
+    errSpan.style.opacity = "0";
+    setTimeout(() => errSpan.style.display = "none", 500);
+  }, 5000);
 }
 
 async function setupCameras() {
@@ -1184,11 +822,7 @@ async function setupCameras() {
         opt.innerText = cam.label || `Camera ${cameraSelect.length + 1}`;
         cameraSelect.appendChild(opt);
       });
-      const backCam = cameras.find(
-        (c) =>
-          c.label.toLowerCase().includes("back") ||
-          c.label.toLowerCase().includes("environment"),
-      );
+      const backCam = cameras.find((c) => c.label.toLowerCase().includes("back") || c.label.toLowerCase().includes("environment"));
       currentCameraId = backCam ? backCam.id : cameras[0].id;
       cameraSelect.value = currentCameraId;
       return true;
@@ -1215,15 +849,33 @@ function startScanner(cameraConfig) {
       document.getElementById("btn-stop-scan").style.display = "inline-flex";
       scannerControls.style.display = "flex";
     })
-    .catch(() => alert("Camera access denied or in use."));
+    .catch(() => showCameraError());
 }
 
+// OPTIMIZATION: 250ms Hardware Delay and Status Overlay
 function restartScanner() {
   if (html5QrCode?.isScanning) {
+    const reader = document.getElementById("reader");
+    reader.style.position = "relative";
+
+    let overlay = document.getElementById("scanner-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "scanner-overlay";
+      overlay.style.cssText = "position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; display: flex; align-items: center; justify-content: center; font-weight: 500; z-index: 10;";
+      overlay.innerText = "Updating camera...";
+      reader.appendChild(overlay);
+    } else {
+      overlay.style.display = "flex";
+    }
+
     html5QrCode
       .stop()
       .then(() => {
-        startScanner(currentCameraId);
+        setTimeout(() => {
+          startScanner(currentCameraId);
+          if (overlay) overlay.style.display = "none";
+        }, 250);
       })
       .catch((err) => console.log("Error stopping scanner", err));
   }
@@ -1236,13 +888,11 @@ cameraSelect.addEventListener("change", (e) => {
 
 qrboxSizeInput.addEventListener("change", () => restartScanner());
 
-document
-  .getElementById("btn-start-scan")
-  .addEventListener("click", async () => {
-    if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-    const hasCameras = await setupCameras();
-    startScanner(hasCameras ? currentCameraId : { facingMode: "environment" });
-  });
+document.getElementById("btn-start-scan").addEventListener("click", async () => {
+  if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+  const hasCameras = await setupCameras();
+  startScanner(hasCameras ? currentCameraId : { facingMode: "environment" });
+});
 
 document.getElementById("btn-stop-scan").addEventListener("click", () => {
   if (html5QrCode) {
@@ -1272,21 +922,16 @@ document.getElementById("qr-file-upload").addEventListener("change", (e) => {
   }
 });
 
-// Scan View - Clear Scan Result Event
-document
-  .getElementById("btn-clear-scan-result")
-  .addEventListener("click", () => {
-    scanResultCard.style.display = "none";
-    scanResultText.value = "";
-    scanImagePreview.style.display = "none";
-    scanImagePreview.src = "";
-    document.getElementById("qr-file-upload").value = "";
-  });
+document.getElementById("btn-clear-scan-result").addEventListener("click", () => {
+  scanResultCard.style.display = "none";
+  scanResultText.value = "";
+  scanImagePreview.style.display = "none";
+  scanImagePreview.src = "";
+  document.getElementById("qr-file-upload").value = "";
+});
 
 document.getElementById("btn-copy-result").onclick = () =>
-  navigator.clipboard
-    .writeText(scanResultText.value)
-    .then(() => alert("Copied!"));
+  navigator.clipboard.writeText(scanResultText.value).then(() => alert("Copied!"));
 document.getElementById("btn-share-result").onclick = () => {
   if (navigator.share) navigator.share({ text: scanResultText.value });
 };
@@ -1294,20 +939,36 @@ document.getElementById("btn-share-result").onclick = () => {
 // ==========================================
 // 5. URL ROUTING & DEEP-LINK INTERCEPTION
 // ==========================================
+function handleRoute(isPopState = false) {
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get("action") || "create";
+  let typeKey = params.get("type");
 
-// SINGLE declaration for the entire app routing logic
-const urlParams = new URLSearchParams(window.location.search);
+  if (action === "scan" || params.get("shared_file") === "true") {
+    document.querySelector('[data-target="scan-view"]').click();
+  } else if (action === "settings") {
+    document.querySelector('[data-target="settings-view"]').click();
+  } else {
+    document.querySelector('[data-target="create-view"]').click();
 
-// 1. If app was opened via shortcut or shared image, switch to Scan tab
-if (
-  urlParams.get("action") === "scan" ||
-  urlParams.get("shared_file") === "true"
-) {
-  document.querySelector('[data-target="scan-view"]').click();
+    if (!typeKey || !qrConfig[typeKey]) {
+      typeKey = Object.keys(qrConfig)[0];
+      if (!isPopState) {
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set("action", "create");
+        newUrl.searchParams.set("type", typeKey);
+        window.history.replaceState({ action: "create", type: typeKey }, "", newUrl);
+      }
+    }
+    renderForm(typeKey);
+  }
 }
 
-// 2. If app was opened via OS Image Share, fetch the cached image and scan it
-if (urlParams.get("shared_file") === "true") {
+window.addEventListener("popstate", () => handleRoute(true));
+handleRoute();
+
+const initialParams = new URLSearchParams(window.location.search);
+if (initialParams.get("shared_file") === "true") {
   if ("caches" in window) {
     caches.open("qr-shared-image-cache").then((cache) => {
       cache.match("/shared-image-temp").then((response) => {
@@ -1315,7 +976,6 @@ if (urlParams.get("shared_file") === "true") {
           response.blob().then((blob) => {
             const file = new File([blob], "shared_qr.jpg", { type: blob.type });
 
-            // Show preview to the user
             const reader = new FileReader();
             reader.onload = (e) => {
               scanImagePreview.src = e.target.result;
@@ -1323,14 +983,12 @@ if (urlParams.get("shared_file") === "true") {
             };
             reader.readAsDataURL(file);
 
-            // Execute Scan
             if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
             html5QrCode
               .scanFile(file, true)
               .then((txt) => handleScanSuccess(txt, true))
               .catch(() => alert("No QR code found in the shared image."));
 
-            // Clean up cache after processing to save space
             cache.delete("/shared-image-temp");
           });
         }
