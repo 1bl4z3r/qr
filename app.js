@@ -939,15 +939,43 @@ document.getElementById("btn-share-result").onclick = () => {
 // ==========================================
 // 5. URL ROUTING & DEEP-LINK INTERCEPTION
 // ==========================================
+// Replace the existing handleRoute function in app.js
 function handleRoute(isPopState = false) {
   const params = new URLSearchParams(window.location.search);
   const action = params.get("action") || "create";
   let typeKey = params.get("type");
 
+  // Reset pulses
+  document.getElementById("btn-start-scan").classList.remove("highlight-pulse");
+  document.querySelector('label[for="qr-file-upload"]').classList.remove("highlight-pulse");
+
   if (action === "scan" || params.get("shared_file") === "true") {
     document.querySelector('[data-target="scan-view"]').click();
+
+    // Dynamic SEO Metadata for Scan Tab
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.name = "description";
+      document.head.appendChild(metaDesc);
+    }
+
+    if (typeKey === "camera") {
+      document.title = "Scan QR via Camera | QR Studio";
+      metaDesc.content = "Securely scan QR codes directly using your device camera. 100% offline and privacy-focused.";
+      document.getElementById("btn-start-scan").classList.add("highlight-pulse");
+    } else if (typeKey === "image") {
+      document.title = "Scan QR via Image | QR Studio";
+      metaDesc.content = "Upload and decode QR code images instantly without sending data to a server. Fast, free, and offline.";
+      document.querySelector('label[for="qr-file-upload"]').classList.add("highlight-pulse");
+    } else {
+      document.title = "Scan QR Code | QR Studio";
+      metaDesc.content = "Scan and decode QR codes locally on your device. Free, fully offline, and secure.";
+    }
+
   } else if (action === "settings") {
     document.querySelector('[data-target="settings-view"]').click();
+    document.title = "Settings | QR Studio";
   } else {
     document.querySelector('[data-target="create-view"]').click();
 

@@ -143,3 +143,14 @@ input[type="range"]::-moz-range-track {
   #app-content { padding-right: calc(var(--nav-size) + 20px); padding-bottom: 16px; }
   .m3-nav { top: 0; bottom: 0; left: auto; right: 0; width: var(--nav-size); height: 100vh; flex-direction: column; justify-content: center; gap: 32px; border-left: 1px solid var(--md-outline); }
 }
+
+@keyframes pulse-btn {
+  0% { box-shadow: 0 0 0 0 rgba(103, 80, 164, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(103, 80, 164, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(103, 80, 164, 0); }
+}
+
+.highlight-pulse {
+  animation: pulse-btn 2s infinite;
+  border: 2px solid var(--md-primary);
+}
