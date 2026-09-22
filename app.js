@@ -26,11 +26,16 @@ const qrConfig = {
       let baseUri = data["url-input"];
       if (!baseUri) return null;
       if (data["url-src"] || data["url-med"] || data["url-name"]) {
-        const url = new URL(baseUri.startsWith("http") ? baseUri : "https://" + baseUri);
-        if (data["url-src"]) url.searchParams.append("utm_source", data["url-src"]);
-        if (data["url-med"]) url.searchParams.append("utm_medium", data["url-med"]);
-        if (data["url-name"]) url.searchParams.append("utm_campaign", data["url-name"]);
-        return url.toString();
+        try {
+          const url = new URL(baseUri.startsWith("http") ? baseUri : "https://" + baseUri);
+          if (data["url-src"]) url.searchParams.append("utm_source", data["url-src"]);
+          if (data["url-med"]) url.searchParams.append("utm_medium", data["url-med"]);
+          if (data["url-name"]) url.searchParams.append("utm_campaign", data["url-name"]);
+          return url.toString();
+        } catch (e) {
+          alert("Invalid URL format. Please enter a valid website address.");
+          return null;
+        }
       }
       return baseUri;
     },
@@ -300,8 +305,15 @@ const qrConfig = {
 };
 
 // ==========================================
-// 2. UI RENDERING ENGINE
+// 2. UI RENDERING ENGINE & HELPERS
 // ==========================================
+function readImageFile(file, callback) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => callback(e.target.result);
+  reader.readAsDataURL(file);
+}
+
 const typeSelect = document.getElementById("qr-type");
 const formContainer = document.getElementById("dynamic-form-container");
 
@@ -408,7 +420,6 @@ function extractFormData(fields, dataObj = {}) {
   return dataObj;
 }
 
-// Dynamically update SEO Metadata
 function updateMetadata(typeKey) {
   const config = qrConfig[typeKey];
   if (config) {
@@ -426,8 +437,6 @@ function updateMetadata(typeKey) {
 function renderForm(typeKey) {
   formContainer.innerHTML = "";
   const fields = qrConfig[typeKey].fields;
-
-  // OPTIMIZATION: Use DocumentFragment for batched DOM painting
   const fragment = document.createDocumentFragment();
   fields.forEach((field) => fragment.appendChild(createFieldNode(field)));
   formContainer.appendChild(fragment);
@@ -437,12 +446,10 @@ function renderForm(typeKey) {
   updateMetadata(typeKey);
 }
 
-// Handle Manual Dropdown Selection
 typeSelect.addEventListener("change", (e) => {
   const newType = e.target.value;
   renderForm(newType);
 
-  // Push state to update URL without reloading
   const newUrl = new URL(window.location);
   newUrl.searchParams.set("action", "create");
   newUrl.searchParams.set("type", newType);
@@ -452,6 +459,22 @@ typeSelect.addEventListener("change", (e) => {
 // ==========================================
 // 3. CONTRAST MATH & PERSISTENCE
 // ==========================================
+let qrSettings = JSON.parse(localStorage.getItem("qrSettings") || localStorage.getItem("qr_settings")) || {
+  fg: "#000000",
+  bg: "#ffffff",
+  ec: "M",
+  theme: "system",
+  logo: null,
+  dotStyle: "square",
+  cornerSquareStyle: "none",
+  cornerDotStyle: "none"
+};
+
+// Ensure default fallback values
+if (!qrSettings.dotStyle) qrSettings.dotStyle = "square";
+if (!qrSettings.cornerSquareStyle) qrSettings.cornerSquareStyle = "none";
+if (!qrSettings.cornerDotStyle) qrSettings.cornerDotStyle = "none";
+
 function hexToRgb(hex) {
   let r = parseInt(hex.slice(1, 3), 16);
   let g = parseInt(hex.slice(3, 5), 16);
@@ -460,7 +483,7 @@ function hexToRgb(hex) {
 }
 
 function getLuminance(r, g, b) {
-  let a = [r, g, b].map(function (v) {
+  let a = [r, g, b].map((v) => {
     v /= 255;
     return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
   });
@@ -468,8 +491,8 @@ function getLuminance(r, g, b) {
 }
 
 function updateContrastUI() {
-  const fg = document.getElementById("color-fg").value;
-  const bg = document.getElementById("color-bg").value;
+  const fg = fgInput.value;
+  const bg = bgInput.value;
 
   let rgb1 = hexToRgb(fg);
   let rgb2 = hexToRgb(bg);
@@ -495,15 +518,6 @@ function updateContrastUI() {
   }
 }
 
-const fgInput = document.getElementById("color-fg");
-const bgInput = document.getElementById("color-bg");
-const ecInput = document.getElementById("error-correction");
-
-fgInput.value = localStorage.getItem("qr_fg") || "#000000";
-bgInput.value = localStorage.getItem("qr_bg") || "#ffffff";
-ecInput.value = localStorage.getItem("qr_ec") || "M";
-
-// OPTIMIZATION: Debounce function to prevent local storage I/O spam
 function debounce(func, wait) {
   let timeout;
   return function (...args) {
@@ -513,12 +527,22 @@ function debounce(func, wait) {
 }
 
 const saveSettingsDebounced = debounce(() => {
-  localStorage.setItem("qr_fg", fgInput.value);
-  localStorage.setItem("qr_bg", bgInput.value);
-  localStorage.setItem("qr_ec", ecInput.value);
+  const serialized = JSON.stringify(qrSettings);
+  localStorage.setItem("qrSettings", serialized);
+  localStorage.setItem("qr_settings", serialized);
 }, 300);
 
+const fgInput = document.getElementById("color-fg");
+const bgInput = document.getElementById("color-bg");
+const ecInput = document.getElementById("error-correction");
+
+fgInput.value = qrSettings.fg;
+bgInput.value = qrSettings.bg;
+ecInput.value = qrSettings.ec;
+
 const handleColorChange = () => {
+  qrSettings.fg = fgInput.value;
+  qrSettings.bg = bgInput.value;
   updateContrastUI();
   saveSettingsDebounced();
 };
@@ -526,6 +550,7 @@ const handleColorChange = () => {
 fgInput.addEventListener("input", handleColorChange);
 bgInput.addEventListener("input", handleColorChange);
 ecInput.addEventListener("change", () => {
+  qrSettings.ec = ecInput.value;
   updateContrastUI();
   saveSettingsDebounced();
 });
@@ -533,11 +558,12 @@ updateContrastUI();
 
 // App Theme Logic
 const appThemeSelector = document.getElementById("app-theme-selector");
-appThemeSelector.value = localStorage.getItem("qr_app_theme") || "system";
+appThemeSelector.value = qrSettings.theme;
 
 appThemeSelector.addEventListener("change", (e) => {
   const selectedTheme = e.target.value;
-  localStorage.setItem("qr_app_theme", selectedTheme);
+  qrSettings.theme = selectedTheme;
+  saveSettingsDebounced();
   if (selectedTheme === "system") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme", selectedTheme);
 });
@@ -546,59 +572,86 @@ appThemeSelector.addEventListener("change", (e) => {
 const logoInput = document.getElementById("logo-input");
 const logoPreviewContainer = document.getElementById("logo-preview-container");
 const logoPreview = document.getElementById("logo-preview");
-let savedLogoData = localStorage.getItem("qr_logo") || null;
 
-if (savedLogoData) {
-  logoPreview.src = savedLogoData;
+if (qrSettings.logo) {
+  logoPreview.src = qrSettings.logo;
   logoPreviewContainer.style.display = "flex";
 }
 
 logoInput.addEventListener('change', (e) => {
-  if (e.target.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_SIZE = 200;
-        let width = img.width;
-        let height = img.height;
+  readImageFile(e.target.files[0], (dataUrl) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX_SIZE = 200;
+      let width = img.width;
+      let height = img.height;
 
-        if (width > height && width > MAX_SIZE) {
-          height *= MAX_SIZE / width;
-          width = MAX_SIZE;
-        } else if (height > MAX_SIZE) {
-          width *= MAX_SIZE / height;
-          height = MAX_SIZE;
-        }
+      if (width > height && width > MAX_SIZE) {
+        height *= MAX_SIZE / width;
+        width = MAX_SIZE;
+      } else if (height > MAX_SIZE) {
+        width *= MAX_SIZE / height;
+        height = MAX_SIZE;
+      }
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
 
-        savedLogoData = canvas.toDataURL('image/webp', 0.8);
+      qrSettings.logo = canvas.toDataURL('image/webp', 0.8);
 
-        try {
-          localStorage.setItem('qr_logo', savedLogoData);
-          logoPreview.src = savedLogoData;
-          logoPreviewContainer.style.display = 'flex';
-        } catch(err) {
-          alert("Storage limit exceeded. Try clearing cache or using a simpler image.");
-        }
-      };
-      img.src = event.target.result;
+      try {
+        saveSettingsDebounced();
+        logoPreview.src = qrSettings.logo;
+        logoPreviewContainer.style.display = 'flex';
+      } catch(err) {
+        alert("Storage limit exceeded. Try clearing cache or using a simpler image.");
+      }
     };
-    reader.readAsDataURL(e.target.files[0]);
-  }
+    img.src = dataUrl;
+  });
 });
 
 document.getElementById("btn-clear-logo").addEventListener("click", () => {
-  savedLogoData = null;
-  localStorage.removeItem("qr_logo");
+  qrSettings.logo = null;
+  saveSettingsDebounced();
   logoPreviewContainer.style.display = "none";
   logoInput.value = "";
 });
+
+// Style Customization Selectors
+const dotStyleSelect = document.getElementById("dotStyle");
+const cornerSquareStyleSelect = document.getElementById("cornerSquareStyle");
+const cornerDotStyleSelect = document.getElementById("cornerDotStyle");
+
+if (dotStyleSelect) {
+  dotStyleSelect.value = qrSettings.dotStyle;
+  dotStyleSelect.addEventListener("change", (e) => {
+    qrSettings.dotStyle = e.target.value;
+    cachedQrInstances = [];
+    saveSettingsDebounced();
+  });
+}
+
+if (cornerSquareStyleSelect) {
+  cornerSquareStyleSelect.value = qrSettings.cornerSquareStyle;
+  cornerSquareStyleSelect.addEventListener("change", (e) => {
+    qrSettings.cornerSquareStyle = e.target.value;
+    cachedQrInstances = [];
+    saveSettingsDebounced();
+  });
+}
+
+if (cornerDotStyleSelect) {
+  cornerDotStyleSelect.value = qrSettings.cornerDotStyle;
+  cornerDotStyleSelect.addEventListener("change", (e) => {
+    qrSettings.cornerDotStyle = e.target.value;
+    cachedQrInstances = [];
+    saveSettingsDebounced();
+  });
+}
 
 // ==========================================
 // 4. GENERATION & SCANNING LOGIC
@@ -606,16 +659,38 @@ document.getElementById("btn-clear-logo").addEventListener("click", () => {
 
 const navItems = document.querySelectorAll(".nav-item");
 const views = document.querySelectorAll(".view");
+
 navItems.forEach((item) => {
-  item.addEventListener("click", () => {
+  item.addEventListener("click", (e) => {
     navItems.forEach((nav) => nav.classList.remove("active"));
     views.forEach((view) => view.classList.remove("active"));
     item.classList.add("active");
-    document.getElementById(item.dataset.target).classList.add("active");
+
+    const targetView = item.dataset.target;
+    document.getElementById(targetView).classList.add("active");
+
+    // Only update browser history on a real user click, preventing loops from programmatic .click()
+    if (e.isTrusted) {
+      const newUrl = new URL(window.location);
+
+      if (targetView === "scan-view") {
+        newUrl.searchParams.set("action", "scan");
+        newUrl.searchParams.delete("type");
+      } else if (targetView === "create-view") {
+        newUrl.searchParams.set("action", "create");
+        const currentType = document.getElementById("qr-type").value;
+        if (currentType) newUrl.searchParams.set("type", currentType);
+      } else if (targetView === "settings-view") {
+        newUrl.searchParams.set("action", "settings");
+        newUrl.searchParams.delete("type");
+      }
+      window.history.pushState({ action: newUrl.searchParams.get("action") },"",newUrl);
+    }
   });
 });
 
-let currentQrInstances = [];
+let cachedQrInstances = []; // Keeps QRCodeStyling objects in memory
+let currentQrInstances = []; // Keeps track of active objects displayed in the current view
 
 function chunkString(str, size) {
   const chars = Array.from(str);
@@ -626,18 +701,48 @@ function chunkString(str, size) {
   return chunks;
 }
 
-function createQRInstance(data) {
-  return new QRCodeStyling({
+function getOrCreateQRInstance(data, index = 0) {
+  const options = {
     width: 300,
     height: 300,
     type: "canvas",
     data: data,
-    image: savedLogoData,
-    dotsOptions: { color: fgInput.value, type: "square" },
+    image: qrSettings.logo,
+    dotsOptions: {
+      color: fgInput.value,
+      type: qrSettings.dotStyle || "square",
+    },
     backgroundOptions: { color: bgInput.value },
     imageOptions: { crossOrigin: "anonymous", margin: 10 },
-    qrOptions: { errorCorrectionLevel: savedLogoData ? "H" : ecInput.value },
-  });
+    qrOptions: { errorCorrectionLevel: qrSettings.logo ? "H" : ecInput.value },
+  };
+
+  // Apply Corner Squares style if not 'none'
+  const cornerSquare = qrSettings.cornerSquareStyle && qrSettings.cornerSquareStyle !== "none"
+    ? qrSettings.cornerSquareStyle
+    : undefined;
+  options.cornersSquareOptions = {
+    color: fgInput.value,
+    ...(cornerSquare && { type: cornerSquare })
+  };
+
+  // Apply Corner Dots style if not 'none'
+  const cornerDot = qrSettings.cornerDotStyle && qrSettings.cornerDotStyle !== "none"
+    ? qrSettings.cornerDotStyle
+    : undefined;
+  options.cornersDotOptions = {
+    color: fgInput.value,
+    ...(cornerDot && { type: cornerDot })
+  };
+
+  if (cachedQrInstances[index]) {
+    cachedQrInstances[index].update(options);
+    return cachedQrInstances[index];
+  } else {
+    const instance = new QRCodeStyling(options);
+    cachedQrInstances[index] = instance;
+    return instance;
+  }
 }
 
 function renderAccordionQRs(payloads, container) {
@@ -658,7 +763,7 @@ function renderAccordionQRs(payloads, container) {
     qrWrapper.style.display = "flex";
     qrWrapper.style.justifyContent = "center";
 
-    const instance = createQRInstance(payload);
+    const instance = getOrCreateQRInstance(payload, index);
     instance.append(qrWrapper);
     currentQrInstances.push(instance);
 
@@ -686,7 +791,7 @@ document.getElementById("btn-generate").addEventListener("click", async () => {
     renderAccordionQRs(qrPayloads, container);
   } else {
     try {
-      const instance = createQRInstance(qrPayloads[0]);
+      const instance = getOrCreateQRInstance(qrPayloads[0], 0);
       await instance.getRawData("png");
       container.style.flexDirection = "row";
       instance.append(container);
@@ -718,7 +823,6 @@ document.getElementById("btn-download").onclick = () => {
   });
 };
 
-// OPTIMIZATION: Mapped Promises Array for batched Canvas processing
 document.getElementById("btn-share-qr").onclick = async () => {
   const canvases = Array.from(document.getElementById("qr-canvas-container").querySelectorAll("canvas"));
   if (canvases.length > 0 && navigator.canShare) {
@@ -787,7 +891,6 @@ function handleScanSuccess(decodedText, isFile = false) {
   scanResultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// OPTIMIZATION: Clean, fading DOM error inject for camera permissions
 function showCameraError() {
   document.getElementById("btn-start-scan").style.display = "inline-flex";
   document.getElementById("btn-stop-scan").style.display = "none";
@@ -852,7 +955,6 @@ function startScanner(cameraConfig) {
     .catch(() => showCameraError());
 }
 
-// OPTIMIZATION: 250ms Hardware Delay and Status Overlay
 function restartScanner() {
   if (html5QrCode?.isScanning) {
     const reader = document.getElementById("reader");
@@ -910,12 +1012,10 @@ document.getElementById("qr-file-upload").addEventListener("change", (e) => {
     html5QrCode
       .scanFile(file, true)
       .then((txt) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          scanImagePreview.src = e.target.result;
+        readImageFile(file, (dataUrl) => {
+          scanImagePreview.src = dataUrl;
           scanImagePreview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
+        });
         handleScanSuccess(txt, true);
       })
       .catch(() => alert("Could not find a QR code in that image."));
@@ -939,20 +1039,17 @@ document.getElementById("btn-share-result").onclick = () => {
 // ==========================================
 // 5. URL ROUTING & DEEP-LINK INTERCEPTION
 // ==========================================
-// Replace the existing handleRoute function in app.js
 function handleRoute(isPopState = false) {
   const params = new URLSearchParams(window.location.search);
   const action = params.get("action") || "create";
   let typeKey = params.get("type");
 
-  // Reset pulses
   document.getElementById("btn-start-scan").classList.remove("highlight-pulse");
   document.querySelector('label[for="qr-file-upload"]').classList.remove("highlight-pulse");
 
   if (action === "scan" || params.get("shared_file") === "true") {
     document.querySelector('[data-target="scan-view"]').click();
 
-    // Dynamic SEO Metadata for Scan Tab
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement('meta');
@@ -1004,12 +1101,10 @@ if (initialParams.get("shared_file") === "true") {
           response.blob().then((blob) => {
             const file = new File([blob], "shared_qr.jpg", { type: blob.type });
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              scanImagePreview.src = e.target.result;
+            readImageFile(file, (dataUrl) => {
+              scanImagePreview.src = dataUrl;
               scanImagePreview.style.display = "block";
-            };
-            reader.readAsDataURL(file);
+            });
 
             if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
             html5QrCode

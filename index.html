@@ -40,12 +40,14 @@
   <link rel="manifest" href="site.webmanifest">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
   <script>
-    const savedAppTheme = localStorage.getItem('qr_app_theme') || 'system';
-    if (savedAppTheme !== 'system') document.documentElement.setAttribute('data-theme', savedAppTheme);
+    try {
+      const settings = JSON.parse(localStorage.getItem('qr_settings'));
+      const savedAppTheme = settings?.theme || 'system';
+      if (savedAppTheme !== 'system') document.documentElement.setAttribute('data-theme', savedAppTheme);
+    } catch (e) {}
   </script>
 </head>
 
@@ -170,6 +172,47 @@
           <img id="logo-preview" src="" alt="Uploaded Logo Preview"
             style="width: 50px; height: 50px; border-radius: 8px; object-fit: contain; background: #fff;">
         </div>
+        <hr aria-hidden="true">
+                <h3>Corner & Dot Styling</h3>
+                <div class="setting-block">
+                  <div class="setting-row">
+                    <label for="dotStyle">Main Dots</label>
+                    <select id="dotStyle" class="m3-input" style="width: auto; margin:0;">
+                      <option value="square">Square</option>
+                      <option value="dots">Dots</option>
+                      <option value="rounded">Rounded</option>
+                      <option value="classy">Classy</option>
+                      <option value="classy-rounded">Classy Rounded</option>
+                      <option value="extra-rounded">Extra Rounded</option>
+                    </select>
+                  </div>
+
+                  <div class="setting-row">
+                    <label for="cornerSquareStyle">Corner Squares</label>
+                    <select id="cornerSquareStyle" class="m3-input" style="width: auto; margin:0;">
+                      <option value="none">None</option>
+                      <option value="square">Square</option>
+                      <option value="dots">Dots</option>
+                      <option value="rounded">Rounded</option>
+                      <option value="classy">Classy</option>
+                      <option value="classy-rounded">Classy Rounded</option>
+                      <option value="extra-rounded">Extra Rounded</option>
+                    </select>
+                  </div>
+
+                  <div class="setting-row" style="margin-bottom: 0;">
+                    <label for="cornerDotStyle">Corner Dots</label>
+                    <select id="cornerDotStyle" class="m3-input" style="width: auto; margin:0;">
+                      <option value="none">None</option>
+                      <option value="square">Square</option>
+                      <option value="dots">Dots</option>
+                      <option value="rounded">Rounded</option>
+                      <option value="classy">Classy</option>
+                      <option value="classy-rounded">Classy Rounded</option>
+                      <option value="extra-rounded">Extra Rounded</option>
+                    </select>
+                  </div>
+                </div>
       </div>
 
       <div class="m3-card">
