@@ -270,6 +270,13 @@
             cameras will fail to read the QR code. Use the built-in checker to aim for a contrast ratio of at least
             4.5:1 to ensure scanners can easily read it.</p>
         </details>
+        <details class="faq-item">
+        <summary>What do the "Corner & Dot Styling" options do?</summary>
+        <p>Customizing these options changes the physical shape of your QR code's pattern:<br><br>
+        <strong>Main Dots:</strong> Changes the shape of the primary data modules (the small blocks making up the bulk of the QR code).<br><br>
+        <strong>Corner Squares:</strong> Changes the outer border shape of the three large alignment markers located in the corners.<br><br>
+        <strong>Corner Dots:</strong> Changes the shape of the solid inner block inside those three large corner markers.</p>
+        </details>
 
         <details class="faq-item">
           <summary>Where can I find the source code for this app?</summary>
@@ -281,6 +288,10 @@
       </div>
 
     </section>
+    <div id="update-toast" class="m3-card" style="display: none; position: fixed; bottom: calc(var(--nav-size) + 20px); left: 50%; transform: translateX(-50%); z-index: 9999; background: var(--md-surface-variant); align-items: center; justify-content: space-between; gap: 16px; padding: 12px 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: max-content; max-width: 90vw;">
+        <span style="font-weight: 500;">A new version is available!</span>
+        <button id="btn-update-refresh" class="m3-button primary" style="margin: 0; padding: 8px 16px;">Update</button>
+      </div>
   </main>
 
   <nav class="m3-nav" role="navigation" aria-label="Main Application Navigation">
